@@ -2,8 +2,10 @@
 .classpath
 .project
 .settings
+.idea
 /bin
 /build
 /data
 /log
 /target
+/cfg
