@@ -2,42 +2,37 @@
  * Copyright (c) 2011, Jan Amoyo
  * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without 
- * modification, are permitted provided that the following conditions 
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
  * are met:
  *
- * - Redistributions of source code must retain the above copyright 
+ * - Redistributions of source code must retain the above copyright
  *   notice, this list of conditions and the following disclaimer.
- * 
+ *
  * - Redistributions in binary form must reproduce the above copyright
- *   notice, this list of conditions and the following disclaimer 
+ *   notice, this list of conditions and the following disclaimer
  *   in the documentation and/or other materials provided with the
  *   distribution.
  *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS 
- * FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE 
- * COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, 
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, 
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS 
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED 
- * AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, 
- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF 
- * THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH 
- * DAMAGE. 
- * 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+ * FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+ * COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+ * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+ * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
+ * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED
+ * AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
+ * THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+ * DAMAGE.
+ *
  * QFixMessengerFrame.java
  * 6 Jun 2011
  */
 package com.jramoyo.qfixmessenger.ui;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.GridLayout;
-import java.awt.Toolkit;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
@@ -58,34 +53,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.ComboBoxModel;
-import javax.swing.DefaultListModel;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JComboBox;
-import javax.swing.JFileChooser;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
-import javax.swing.JTable;
-import javax.swing.JTextArea;
-import javax.swing.KeyStroke;
-import javax.swing.ListModel;
-import javax.swing.ListSelectionModel;
-import javax.swing.SwingUtilities;
-import javax.swing.SwingWorker;
+import javax.swing.*;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
@@ -95,6 +63,9 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Marshaller;
 import javax.xml.namespace.QName;
 
+import com.jramoyo.fix.model.decode.MessageFormatter;
+
+import com.jramoyo.qfixmessenger.ui.listeners.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -114,22 +85,6 @@ import com.jramoyo.qfixmessenger.QFixMessenger;
 import com.jramoyo.qfixmessenger.QFixMessengerConstants;
 import com.jramoyo.qfixmessenger.quickfix.QFixMessageListener;
 import com.jramoyo.qfixmessenger.quickfix.util.QFixUtil;
-import com.jramoyo.qfixmessenger.ui.listeners.AboutActionListener;
-import com.jramoyo.qfixmessenger.ui.listeners.CloseProjectActionListener;
-import com.jramoyo.qfixmessenger.ui.listeners.FrameExitActionListener;
-import com.jramoyo.qfixmessenger.ui.listeners.HelpActionListener;
-import com.jramoyo.qfixmessenger.ui.listeners.ImportMessageActionListener;
-import com.jramoyo.qfixmessenger.ui.listeners.LogoffAllSessionsActionListener;
-import com.jramoyo.qfixmessenger.ui.listeners.LogonAllSessionsActionListener;
-import com.jramoyo.qfixmessenger.ui.listeners.LogonSessionItemListener;
-import com.jramoyo.qfixmessenger.ui.listeners.LogonSessionMenuItemSessionStateListener;
-import com.jramoyo.qfixmessenger.ui.listeners.NewProjectActionListener;
-import com.jramoyo.qfixmessenger.ui.listeners.OpenProjectActionListener;
-import com.jramoyo.qfixmessenger.ui.listeners.ResetAllSessionsActionListener;
-import com.jramoyo.qfixmessenger.ui.listeners.ResetSessionActionListener;
-import com.jramoyo.qfixmessenger.ui.listeners.SaveProjectActionListener;
-import com.jramoyo.qfixmessenger.ui.listeners.SessionStatusActionListener;
-import com.jramoyo.qfixmessenger.ui.listeners.SessionsListSessionStateListener;
 import com.jramoyo.qfixmessenger.ui.models.MessagesTableModel;
 import com.jramoyo.qfixmessenger.ui.models.data.MessagesTableModelData;
 import com.jramoyo.qfixmessenger.ui.panels.FreeTextMessagePanel;
@@ -143,772 +98,703 @@ import com.jramoyo.qfixmessenger.ui.util.IconBuilder;
 
 /**
  * Main application frame
- * 
+ *
  * @author jamoyo
  * @author derek.yang
  */
 public class QFixMessengerFrame extends JFrame
 {
-	private static final long serialVersionUID = 7906369617506618477L;
 
-	private static final Logger logger = LoggerFactory
-			.getLogger(QFixMessengerFrame.class);
+    private static final long serialVersionUID = 7906369617506618477L;
 
-	private static final int FRAME_MIN_HEIGHT = 510;
+    private static final Logger logger = LoggerFactory.getLogger(QFixMessengerFrame.class);
 
-	private static final int FRAME_MIN_WIDTH = 600;
+    private static final int FRAME_MIN_HEIGHT = 510;
 
-	private static final int LEFT_PANEL_WIDTH = 170;
+    private static final int FRAME_MIN_WIDTH = 600;
 
-	private static final String VERSION = "2.0";
+    private static final int LEFT_PANEL_WIDTH = 170;
 
-	private static final String EMPTY_PROJECT_NAME = "None";
+    private static final String VERSION = "3.0";
 
-	/**
-	 * Launches the frame
-	 */
-	public static void launch(QFixMessenger messenger)
-	{
-		class Launcher implements Runnable
-		{
-			private final QFixMessenger messenger;
+    private static final String EMPTY_PROJECT_NAME = "None";
 
-			private Launcher(QFixMessenger messenger)
-			{
-				this.messenger = messenger;
-			}
+    /**
+     * Launches the frame
+     */
+    public static void launch(QFixMessenger messenger)
+    {
+        class Launcher implements Runnable
+        {
 
-			@Override
-			public void run()
-			{
-				QFixMessengerFrame frame = new QFixMessengerFrame(messenger);
-				frame.initFrame();
-				frame.initComponents();
-				frame.positionFrame();
-				frame.setVisible(true);
-			}
-		}
+            private final QFixMessenger messenger;
 
-		SwingUtilities.invokeLater(new Launcher(messenger));
-	}
+            private Launcher(QFixMessenger messenger)
+            {
+                this.messenger = messenger;
+            }
 
-	private final Message freeTextMessage = new Message("Free Text",
-			"FIX Message", null, new HashMap<MemberOrder, Boolean>());
+            @Override public void run()
+            {
+                QFixMessengerFrame frame = new QFixMessengerFrame(messenger);
+                frame.initFrame();
+                frame.initComponents();
+                frame.positionFrame();
+                frame.setVisible(true);
+            }
+        }
 
-	private final JPanel blankPanel = new JPanel();
+        SwingUtilities.invokeLater(new Launcher(messenger));
+    }
 
-	private final QFixMessenger messenger;
+    private final Message freeTextMessage = new Message("Free Text", "FIX Message", null, new HashMap<MemberOrder, Boolean>());
 
-	private final FixDictionary fixTDictionary;
+    private final JPanel blankPanel = new JPanel();
 
-	private final MemberPanelCache memberPanelCache;
+    private final QFixMessenger messenger;
 
-	private String frameTitle;
+    private final FixDictionary fixTDictionary;
 
-	private String projectTitle = EMPTY_PROJECT_NAME;
+    private final MemberPanelCache memberPanelCache;
 
-	private ProjectType activeXmlProject;
+    private String frameTitle;
 
-	private File activeProjectFile;
+    private String projectTitle = EMPTY_PROJECT_NAME;
 
-	private FixDictionary activeDictionary;
+    private ProjectType activeXmlProject;
 
-	private Message activeMessage;
+    private File activeProjectFile;
 
-	private boolean isRequiredOnly = true;
+    private FixDictionary activeDictionary;
 
-	private boolean isModifyHeader;
+    private Message activeMessage;
 
-	private boolean isModifyTrailer;
+    private boolean isRequiredOnly = true;
 
-	private boolean isFixTSession;
+    private boolean isModifyHeader;
 
-	private boolean isPreviewBeforeSend;
+    private boolean isModifyTrailer;
 
-	private JMenuBar menuBar;
+    private boolean isFixTSession;
 
-	private JMenu fileMenu;
+    private boolean isPreviewBeforeSend;
 
-	private JMenu sessionMenu;
+    private JMenuBar menuBar;
 
-	private JMenu helpMenu;
+    private JMenu fileMenu;
 
-	private JMenu windowMenu;
+    private JMenu sessionMenu;
 
-	private JMenuItem closeProjectMenuItem;
+    private JMenu helpMenu;
 
-	private JMenuItem saveProjectMenuItem;
+    private JMenu windowMenu;
 
-	private JPanel leftPanel;
+    private JMenuItem closeProjectMenuItem;
 
-	private JScrollPane mainPanelScrollPane;
+    private JMenuItem saveProjectMenuItem;
 
-	private JScrollPane bottomPanelScrollPane;
+    private JPanel leftPanel;
 
-	private JPanel rightPanel;
+    private JScrollPane mainPanelScrollPane;
 
-	private JList<Session> sessionsList;
+    private JScrollPane bottomPanelScrollPane;
 
-	private JList<Message> messagesList;
+    private JPanel rightPanel;
 
-	private DefaultListModel<Message> recentMessagesListModel;
+    private JList<Session> sessionsList;
 
-	private JList<Message> recentMessagesList;
+    private JList<Message> messagesList;
 
-	private Map<String, DefaultListModel<Message>> recentMessagesMap;
+    private DefaultListModel<Message> recentMessagesListModel;
 
-	private JTabbedPane messagesTabPane;
+    private JList<Message> recentMessagesList;
 
-	private JComboBox<String> appVersionsComboBox;
+    private Map<String, DefaultListModel<Message>> recentMessagesMap;
 
-	private JCheckBox requiredCheckBox;
+    private JTabbedPane messagesTabPane;
 
-	private JCheckBox modifyHeaderCheckBox;
+    private JComboBox<String> appVersionsComboBox;
 
-	private JCheckBox modifyTrailerCheckBox;
+    private JCheckBox requiredCheckBox;
 
-	private JCheckBox previewBeforeSendCheckBox;
+    private JCheckBox modifyHeaderCheckBox;
+
+    private JCheckBox modifyTrailerCheckBox;
+
+    private JCheckBox previewBeforeSendCheckBox;
 
 	private JButton destroyButton;
 
-	private JButton addButton;
-
-	private JButton sendButton;
-
-	private JTable messagesTable;
-
-	private MessagePanel messagePanel;
-
-	private FreeTextMessagePanel freeTextMessagePanel;
-
-	private ProjectDialog projectDialog;
-
-	private LogfileDialog logfileDialog;
-
-	private QFixMessengerFrame(QFixMessenger messenger)
-	{
-		super();
-		this.messenger = messenger;
-
-		memberPanelCache = new MemberPanelCache();
-
-		FixDictionaryParser parser = messenger.getParser();
-		String fixTDictionaryFile = messenger.getConfig()
-				.getFixT11DictionaryLocation();
-
-		FixDictionary dictionary = null;
-		try
-		{
-			dictionary = parser.parse(getClass().getResourceAsStream(
-					fixTDictionaryFile));
-		} catch (FixParsingException ex)
-		{
-			logger.error("Unable to parse FIXT 1.1 Dictionary!", ex);
-			System.exit(1);
-		}
-
-		fixTDictionary = dictionary;
-	}
-
-	/**
-	 * Disposes the frame and gracefully exits the application
-	 */
-	public void close()
-	{
-		int choice = JOptionPane.showConfirmDialog(this,
-				"Exit QuickFIX Messenger?", "Quit", JOptionPane.YES_NO_OPTION);
-		if (choice == JOptionPane.YES_OPTION)
-		{
-			if (activeXmlProject != null)
-			{
-				choice = JOptionPane.showConfirmDialog(this,
-						"Do you want to save \"" + activeXmlProject.getName()
-								+ "\"?", "Save Current Project",
-						JOptionPane.YES_NO_CANCEL_OPTION);
-				switch (choice)
-				{
-				case JOptionPane.NO_OPTION:
-					break;
-				case JOptionPane.YES_OPTION:
-					marshallActiveXmlProject();
-					break;
-				case JOptionPane.CANCEL_OPTION:
-					return;
-				}
-			}
-			dispose();
-			messenger.exit();
-		}
-	}
-
-	public void displayMainPanel()
-	{
-		if (messagePanel != null)
-		{
-			memberPanelCache.encacheMembers(messagePanel.getHeaderMembers());
-			memberPanelCache.encacheMembers(messagePanel.getBodyMembers());
-			memberPanelCache.encacheMembers(messagePanel.getTrailerMembers());
-		}
-
-		JPanel mainPanel;
-		if (activeMessage != null)
-		{
-			if (!activeMessage.equals(freeTextMessage))
-			{
-				MessagePanelBuilder builder = new MessagePanelBuilder();
-				builder.setFrame(this);
-				builder.setSession(sessionsList.getSelectedValue());
-				builder.setAppVersion((String) appVersionsComboBox
-						.getSelectedItem());
-				builder.setMessage(activeMessage);
-				builder.setIsRequiredOnly(isRequiredOnly);
-				builder.setIsModifyHeader(isModifyHeader);
-				builder.setIsModifyTrailer(isModifyTrailer);
-				builder.setIsFixTSession(isFixTSession);
-				builder.setDictionary(activeDictionary);
-				builder.setFixTDictionary(fixTDictionary);
-
-				messagePanel = builder.build();
-				mainPanel = messagePanel;
-			} else
-			{
-				freeTextMessagePanel = new FreeTextMessagePanel(messenger,
-						sessionsList.getSelectedValue(),
-						(String) appVersionsComboBox.getSelectedItem(),
-						isFixTSession);
-				mainPanel = freeTextMessagePanel;
-			}
-		} else
-		{
-			mainPanel = blankPanel;
-		}
-
-		mainPanelScrollPane.getViewport().add(mainPanel);
-	}
-
-	/**
-	 * Returns the active XML ProjectType
-	 * 
-	 * @return the active XML ProjectType
-	 */
-	public ProjectType getActiveXmlProject()
-	{
-		return activeXmlProject;
-	}
-
-	public MemberPanelCache getMemberPanelCache()
-	{
-		return memberPanelCache;
-	}
-
-	/**
-	 * Returns the application instance
-	 * 
-	 * @return the application instance
-	 */
-	public QFixMessenger getMessenger()
-	{
-		return messenger;
-	}
-
-	/**
-	 * Returns the current ProjectFrame instance
-	 * 
-	 * @return the current ProjectFrame instance
-	 */
-	public ProjectDialog getProjectFrame()
-	{
-		return projectDialog;
-	}
-
-	/**
-	 * Loads an XML MessageType to the UI
-	 * 
-	 * @param xmlMessageType
-	 *            an XML MessageType
-	 */
-	public void loadXmlMessage(MessageType xmlMessageType)
-	{
-		if (selectSession(xmlMessageType.getSession()))
-		{
-			if (selectMessage(xmlMessageType))
-			{
-				messagePanel.populateXml(xmlMessageType);
-			}
-		}
-	}
-
-	/**
-	 * Saves the active XML ProjectType to a file
-	 */
-	public void marshallActiveXmlProject()
-	{
-		if (activeProjectFile == null)
-		{
-			JFileChooser jFileChooser = new JFileChooser();
-			jFileChooser.setFileFilter(XmlFileFilter.INSTANCE);
-			jFileChooser.setDialogTitle("Save Project");
-			jFileChooser.setSelectedFile(new File("*.xml"));
-
-			int choice = jFileChooser.showSaveDialog(this);
-			if (choice == JFileChooser.APPROVE_OPTION)
-			{
-				activeProjectFile = jFileChooser.getSelectedFile();
-			}
-
-			else if (choice == JFileChooser.CANCEL_OPTION)
-			{
-				return;
-			}
-		}
-
-		new MarshallProjectTypeWorker(this, activeXmlProject, activeProjectFile)
-				.execute();
-	}
-
-	/**
-	 * Saves an XML MessageType to a file
-	 * 
-	 * @param xmlMessageType
-	 *            an XML MessageType
-	 */
-	public void marshallXmlMessage(MessageType xmlMessageType)
-	{
-		JFileChooser jFileChooser = new JFileChooser();
-		jFileChooser.setFileFilter(XmlFileFilter.INSTANCE);
-		jFileChooser.setDialogTitle("Export Message");
-		jFileChooser.setSelectedFile(new File("*.xml"));
-
-		int choice = jFileChooser.showSaveDialog(this);
-		if (choice == JFileChooser.APPROVE_OPTION)
-		{
-			File file = jFileChooser.getSelectedFile();
-			new MarshallMessageTypeWorker(this, xmlMessageType, file).execute();
-		}
-	}
-
-	/**
-	 * Sets the active XML ProjectType
-	 * 
-	 * @param xmlProjectType
-	 *            an XML ProjectType
-	 */
-	public void setActiveXmlProject(ProjectType xmlProjectType,
-			File xmlProjectFile)
-	{
-		this.activeXmlProject = xmlProjectType;
-		this.activeProjectFile = xmlProjectFile;
-		if (projectDialog != null)
-		{
-			projectDialog.dispose();
-			projectDialog = null;
-		}
-
-		if (xmlProjectType != null)
-		{
-			projectTitle = xmlProjectType.getName();
-			loadFrameTitle();
-			saveProjectMenuItem.setEnabled(true);
-			closeProjectMenuItem.setEnabled(true);
-			launchProjectDialog();
-		} else
-		{
-			projectTitle = EMPTY_PROJECT_NAME;
-			loadFrameTitle();
-			saveProjectMenuItem.setEnabled(false);
-			closeProjectMenuItem.setEnabled(false);
-		}
-
-		updateButtons();
-	}
-
-	private GridBagConstraints createRightPanelConstraints()
-	{
-		GridBagConstraints c = new GridBagConstraints();
-		c.fill = GridBagConstraints.HORIZONTAL;
-
-		c.weightx = 0.5;
-		c.weighty = 0.0;
-
-		c.ipadx = 2;
-		c.ipady = 2;
-
-		c.gridx = 0;
-		c.gridy = GridBagConstraints.RELATIVE;
-
-		return c;
-	}
-
-	private void initAppVersionsComboBox()
-	{
-		appVersionsComboBox.setEnabled(false);
-		appVersionsComboBox
-				.addActionListener(new AppVersionsComboBoxActionListener(this));
-	}
-
-	private void initBottomPanel()
-	{
-		MessagesTableModel messagesTableModel = new MessagesTableModel();
-
-		messagesTable = new JTable(messagesTableModel);
-		messagesTable.getColumnModel().getColumn(0).setPreferredWidth(90);
-		messagesTable.getColumnModel().getColumn(1).setPreferredWidth(5);
-		messagesTable.getColumnModel().getColumn(2).setPreferredWidth(75);
-		messagesTable.getColumnModel().getColumn(3).setPreferredWidth(5);
-		messagesTable.getColumnModel().getColumn(4).setPreferredWidth(510);
-
-		messagesTable.setDefaultRenderer(String.class,
-				new MessagesTableCellRender());
-		messagesTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		messagesTable.addMouseListener(new MessagesTableMouseListener(this));
-
-		messenger.getApplication().addMessageListener(messagesTableModel);
-
-		bottomPanelScrollPane = new JScrollPane(messagesTable);
-		bottomPanelScrollPane.setPreferredSize(new Dimension(
-				bottomPanelScrollPane.getPreferredSize().width, 120));
-		bottomPanelScrollPane.getViewport().add(messagesTable);
-		add(bottomPanelScrollPane, BorderLayout.SOUTH);
-	}
-
-	private void initComponents()
-	{
-		setLayout(new BorderLayout());
-
-		initMenuBar();
-		initLeftPanel();
-		initMainPanel();
-		initBottomPanel();
-		initRightPanel();
-
-		pack();
-	}
-
-	private void initFileMenu()
-	{
-		fileMenu = new JMenu("File");
-		fileMenu.setMnemonic('F');
-
-		JMenuItem newProjectMenuItem = new JMenuItem("New Project");
-		newProjectMenuItem.setIcon(IconBuilder.build(
-				getMessenger().getConfig(), IconBuilder.NEW_ICON));
-		newProjectMenuItem.setMnemonic('N');
-		newProjectMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N,
-				InputEvent.CTRL_DOWN_MASK));
-		newProjectMenuItem
-				.addActionListener(new NewProjectActionListener(this));
-
-		saveProjectMenuItem = new JMenuItem("Save Project");
-		saveProjectMenuItem.setIcon(IconBuilder.build(getMessenger()
-				.getConfig(), IconBuilder.SAVE_ICON));
-		saveProjectMenuItem.setMnemonic('S');
-		saveProjectMenuItem.setAccelerator(KeyStroke.getKeyStroke(
-				KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK));
-		saveProjectMenuItem.addActionListener(new SaveProjectActionListener(
-				this));
-		saveProjectMenuItem.setEnabled(false);
-
-		JMenuItem openProjectMenuItem = new JMenuItem("Open Project");
-		openProjectMenuItem.setIcon(IconBuilder.build(getMessenger()
-				.getConfig(), IconBuilder.OPEN_ICON));
-		openProjectMenuItem.setMnemonic('O');
-		openProjectMenuItem.setAccelerator(KeyStroke.getKeyStroke(
-				KeyEvent.VK_O, InputEvent.CTRL_DOWN_MASK));
-		openProjectMenuItem.addActionListener(new OpenProjectActionListener(
-				this));
-
-		closeProjectMenuItem = new JMenuItem("Close Project");
-		closeProjectMenuItem.setIcon(IconBuilder.build(getMessenger()
-				.getConfig(), IconBuilder.CLOSE_ICON));
-		closeProjectMenuItem.setMnemonic('C');
-		closeProjectMenuItem.addActionListener(new CloseProjectActionListener(
-				this));
-		closeProjectMenuItem.setEnabled(false);
-
-		JMenuItem importMessageMenuItem = new JMenuItem("Import Message");
-		importMessageMenuItem.setIcon(IconBuilder.build(getMessenger()
-				.getConfig(), IconBuilder.IMPORT_ICON));
-		importMessageMenuItem.setMnemonic('I');
-		importMessageMenuItem.setAccelerator(KeyStroke.getKeyStroke(
-				KeyEvent.VK_I, InputEvent.CTRL_DOWN_MASK));
-		importMessageMenuItem
-				.addActionListener(new ImportMessageActionListener(this));
-
-		JMenuItem exportMessageMenuItem = new JMenuItem("Export Message");
-		exportMessageMenuItem.setIcon(IconBuilder.build(getMessenger()
-				.getConfig(), IconBuilder.EXPORT_ICON));
-		exportMessageMenuItem
-				.addActionListener(new ExportMessageActionListener(this));
-		exportMessageMenuItem.setMnemonic('X');
-		exportMessageMenuItem.setAccelerator(KeyStroke.getKeyStroke(
-				KeyEvent.VK_E, InputEvent.CTRL_DOWN_MASK));
-
-		JMenuItem exitMenuItem = new JMenuItem("Exit");
-		exitMenuItem.setIcon(IconBuilder.build(getMessenger().getConfig(),
-				IconBuilder.EXIT_ICON));
-		exitMenuItem.setMnemonic('x');
-		exitMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X,
-				InputEvent.ALT_DOWN_MASK));
-		exitMenuItem.addActionListener(new FrameExitActionListener(this));
-
-		fileMenu.add(newProjectMenuItem);
-		fileMenu.add(saveProjectMenuItem);
-		fileMenu.add(openProjectMenuItem);
-		fileMenu.add(closeProjectMenuItem);
-		fileMenu.addSeparator();
-		fileMenu.add(importMessageMenuItem);
-		fileMenu.add(exportMessageMenuItem);
-		fileMenu.addSeparator();
-		fileMenu.add(exitMenuItem);
-	}
-
-	private void initFrame()
-	{
-		if (messenger.getConfig().isInitiator())
-		{
-			frameTitle = "QuickFIX Messenger " + VERSION + " (Initiator)";
-		} else
-		{
-			frameTitle = "QuickFIX Messenger " + VERSION + " (Acceptor)";
-		}
-		loadFrameTitle();
-		setIconImage(IconBuilder.build(getMessenger().getConfig(),
-				IconBuilder.APP_ICON).getImage());
-		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-		addWindowListener(new FrameWindowAdapter(this));
-		setMinimumSize(new Dimension(FRAME_MIN_WIDTH, FRAME_MIN_HEIGHT));
-	}
-
-	private void initHelpMenu()
-	{
-		helpMenu = new JMenu("Help");
-		helpMenu.setMnemonic('H');
-
-		JMenuItem helpMenuItem = new JMenuItem("Help");
-		helpMenuItem.setIcon(IconBuilder.build(getMessenger().getConfig(),
-				IconBuilder.HELP_ICON));
-		helpMenuItem.setMnemonic('H');
-		helpMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F2,
-				InputEvent.SHIFT_DOWN_MASK));
-		helpMenuItem.addActionListener(new HelpActionListener(this));
-
-		JMenuItem aboutMenuItem = new JMenuItem("About");
-		aboutMenuItem.setMnemonic('A');
-		aboutMenuItem.addActionListener(new AboutActionListener(this));
-
-		helpMenu.add(helpMenuItem);
-		helpMenu.add(aboutMenuItem);
-	}
-
-	private void initLeftPanel()
-	{
-		leftPanel = new JPanel();
-		leftPanel.setLayout(new BoxLayout(leftPanel, BoxLayout.Y_AXIS));
-
-		// Sessions Panel
-		sessionsList = new JList<Session>();
-		appVersionsComboBox = new JComboBox<String>(
-				QFixMessengerConstants.FIXT_APP_VERSIONS);
-		JPanel sessionsPanel = new JPanel();
-		sessionsPanel.setBorder(new TitledBorder("Current Sessions"));
-		sessionsPanel.setLayout(new BorderLayout());
-
-		initSessionsList();
-		JScrollPane sessionsListScrollPane = new JScrollPane(sessionsList);
-		sessionsListScrollPane.setPreferredSize(new Dimension(LEFT_PANEL_WIDTH,
-				120));
-		sessionsListScrollPane.setMaximumSize(sessionsListScrollPane
-				.getPreferredSize());
-
-		initAppVersionsComboBox();
-		JPanel appVersionsPanel = new JPanel();
-		appVersionsPanel.setLayout(new GridLayout(2, 1));
-		appVersionsPanel.add(new JLabel("ApplVerID: "));
-		appVersionsPanel.add(appVersionsComboBox);
-
-		sessionsPanel.add(sessionsListScrollPane, BorderLayout.CENTER);
-		sessionsPanel.add(appVersionsPanel, BorderLayout.SOUTH);
-
-		// Prevent resize
-		sessionsPanel.setMinimumSize(sessionsPanel.getPreferredSize());
-		sessionsPanel.setMaximumSize(sessionsPanel.getPreferredSize());
-
-		// Messages Panel
-		messagesList = new JList<Message>();
-
-		recentMessagesMap = new HashMap<>();
-		recentMessagesListModel = new DefaultListModel<Message>();
-		recentMessagesList = new JList<Message>(recentMessagesListModel);
-
-		JPanel messagesPanel = new JPanel();
-		messagesPanel.setBorder(new TitledBorder("Available Messages"));
-		messagesPanel.setLayout(new BoxLayout(messagesPanel, BoxLayout.Y_AXIS));
-
-		initMessagesList();
-
-		JScrollPane messagesListScrollPane = new JScrollPane(messagesList);
-		messagesListScrollPane.setPreferredSize(new Dimension(LEFT_PANEL_WIDTH,
-				300));
-
-		JScrollPane recentMessagesListScrollPane = new JScrollPane(
-				recentMessagesList);
-		messagesTabPane = new JTabbedPane();
-		messagesTabPane.setPreferredSize(new Dimension(LEFT_PANEL_WIDTH, 300));
-		messagesTabPane.addTab("All", messagesListScrollPane);
-		messagesTabPane.addTab("Recent", recentMessagesListScrollPane);
-
-		messagesPanel.add(messagesTabPane);
-
-		leftPanel.add(sessionsPanel);
-		leftPanel.add(messagesPanel);
-		add(leftPanel, BorderLayout.WEST);
-	}
-
-	private void initMainPanel()
-	{
-		mainPanelScrollPane = new JScrollPane();
-		add(mainPanelScrollPane, BorderLayout.CENTER);
-	}
-
-	private void initMenuBar()
-	{
-		menuBar = new JMenuBar();
-
-		initFileMenu();
-		initSessionMenu();
-		initHelpMenu();
-		initWindowMenu();
-
-		menuBar.add(fileMenu);
-		menuBar.add(sessionMenu);
-		menuBar.add(helpMenu);
-		menuBar.add(windowMenu);
-
-		setJMenuBar(menuBar);
-	}
-
-	private void initMessagesList()
-	{
-		messagesList.setCellRenderer(new MessagesListCellRenderer());
-		messagesList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		messagesList.getSelectionModel().addListSelectionListener(
-				new MessagesListSelectionListener(this));
-		messagesList.addMouseListener(new MessagesListMouseAdapter(this));
-
-		recentMessagesList.setCellRenderer(new MessagesListCellRenderer());
-		recentMessagesList
-				.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		recentMessagesList.getSelectionModel().addListSelectionListener(
-				new RecentMessagesListSelectionListener(this));
-		recentMessagesList.addMouseListener(new RecentMessagesListMouseAdapter(
-				this));
-	}
-
-	private void initRightPanel()
-	{
-		rightPanel = new JPanel();
-		rightPanel.setLayout(new BorderLayout());
-
-		JPanel optionsPanel = new JPanel();
-		optionsPanel.setBorder(new TitledBorder("Options"));
-		optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.Y_AXIS));
-
-		requiredCheckBox = new JCheckBox("Required Only", true);
-		requiredCheckBox.addItemListener(new ItemListener()
-		{
-			@Override
-			public void itemStateChanged(ItemEvent e)
-			{
-				if (e.getStateChange() == ItemEvent.SELECTED)
-				{
-					isRequiredOnly = true;
-				} else
-				{
-					isRequiredOnly = false;
-				}
-
-				if (logger.isDebugEnabled())
-				{
-					logger.debug("Selected isRequiredOnly = " + isRequiredOnly);
-				}
-				displayMainPanel();
-			}
-		});
-
-		modifyHeaderCheckBox = new JCheckBox("Modify Header", false);
-		modifyHeaderCheckBox.addItemListener(new ItemListener()
-		{
-			@Override
-			public void itemStateChanged(ItemEvent e)
-			{
-				if (e.getStateChange() == ItemEvent.SELECTED)
-				{
-					isModifyHeader = true;
-				} else
-				{
-					isModifyHeader = false;
-				}
-
-				if (logger.isDebugEnabled())
-				{
-					logger.debug("Selected isModifyHeader = " + isModifyHeader);
-				}
-				displayMainPanel();
-			}
-		});
-
-		modifyTrailerCheckBox = new JCheckBox("Modify Trailer", false);
-		modifyTrailerCheckBox.addItemListener(new ItemListener()
-		{
-			@Override
-			public void itemStateChanged(ItemEvent e)
-			{
-				if (e.getStateChange() == ItemEvent.SELECTED)
-				{
-					isModifyTrailer = true;
-				} else
-				{
-					isModifyTrailer = false;
-				}
-
-				if (logger.isDebugEnabled())
-				{
-					logger.debug("Selected isModifyTrailer = "
-							+ isModifyTrailer);
-				}
-				displayMainPanel();
-			}
-		});
-
-		optionsPanel.add(requiredCheckBox);
-		optionsPanel.add(modifyHeaderCheckBox);
-		optionsPanel.add(modifyTrailerCheckBox);
-
-		JPanel sendPanel = new JPanel();
-		sendPanel.setLayout(new GridBagLayout());
-
-		previewBeforeSendCheckBox = new JCheckBox("Preview Before Sending",
-				false);
-		previewBeforeSendCheckBox.addItemListener(new ItemListener()
-		{
-			@Override
-			public void itemStateChanged(ItemEvent e)
-			{
-				if (e.getStateChange() == ItemEvent.SELECTED)
-				{
-					isPreviewBeforeSend = true;
-				} else
-				{
-					isPreviewBeforeSend = false;
-				}
-
-				if (logger.isDebugEnabled())
-				{
-					logger.debug("Selected isPreviewBeforeSend = "
-							+ isPreviewBeforeSend);
-				}
-			}
-		});
+    private JButton addButton;
+
+    private JButton sendButton;
+
+    private JTable messagesTable;
+
+    private MessagePanel messagePanel;
+
+    private FreeTextMessagePanel freeTextMessagePanel;
+
+    private ProjectDialog projectDialog;
+
+    private LogfileDialog logfileDialog;
+
+    private QFixMessengerFrame(QFixMessenger messenger)
+    {
+        super();
+        this.messenger = messenger;
+
+        memberPanelCache = new MemberPanelCache();
+
+        FixDictionaryParser parser = messenger.getParser();
+        String fixTDictionaryFile = messenger.getConfig().getFixT11DictionaryLocation();
+        logger.info("fixTDictionaryFile=" + fixTDictionaryFile);
+        logger.info("getResourceAsStream: " + getClass().getResourceAsStream(fixTDictionaryFile));
+
+        FixDictionary dictionary = null;
+        try {
+            dictionary = parser.parse(getClass().getResourceAsStream(fixTDictionaryFile));
+        } catch (FixParsingException ex) {
+            logger.error("Unable to parse FIXT 1.1 Dictionary!", ex);
+            System.exit(1);
+        }
+
+        fixTDictionary = dictionary;
+    }
+
+    /**
+     * Disposes the frame and gracefully exits the application
+     */
+    public void close()
+    {
+        int choice = JOptionPane.showConfirmDialog(this, "Exit QuickFIX Messenger?", "Quit", JOptionPane.YES_NO_OPTION);
+        if (choice == JOptionPane.YES_OPTION) {
+            if (activeXmlProject != null) {
+                choice = JOptionPane.showConfirmDialog(this, "Do you want to save \"" + activeXmlProject.getName() + "\"?", "Save Current Project", JOptionPane.YES_NO_CANCEL_OPTION);
+                switch (choice) {
+                    case JOptionPane.NO_OPTION:
+                        break;
+                    case JOptionPane.YES_OPTION:
+                        marshallActiveXmlProject();
+                        break;
+                    case JOptionPane.CANCEL_OPTION:
+                        return;
+                }
+            }
+            dispose();
+            messenger.exit();
+        }
+    }
+
+    public void displayMainPanel()
+    {
+        if (messagePanel != null) {
+            memberPanelCache.encacheMembers(messagePanel.getHeaderMembers());
+            memberPanelCache.encacheMembers(messagePanel.getBodyMembers());
+            memberPanelCache.encacheMembers(messagePanel.getTrailerMembers());
+        }
+
+        JPanel mainPanel;
+        if (activeMessage != null) {
+            if (!activeMessage.equals(freeTextMessage)) {
+                MessagePanelBuilder builder = new MessagePanelBuilder();
+                builder.setFrame(this);
+                builder.setSession(sessionsList.getSelectedValue());
+                builder.setAppVersion((String) appVersionsComboBox.getSelectedItem());
+                builder.setMessage(activeMessage);
+                builder.setIsRequiredOnly(isRequiredOnly);
+                builder.setIsModifyHeader(isModifyHeader);
+                builder.setIsModifyTrailer(isModifyTrailer);
+                builder.setIsFixTSession(isFixTSession);
+                builder.setDictionary(activeDictionary);
+                builder.setFixTDictionary(fixTDictionary);
+
+                messagePanel = builder.build();
+                mainPanel = messagePanel;
+            }
+            else {
+                freeTextMessagePanel = new FreeTextMessagePanel(messenger, sessionsList.getSelectedValue(), (String) appVersionsComboBox.getSelectedItem(), isFixTSession);
+                mainPanel = freeTextMessagePanel;
+            }
+        }
+        else {
+            mainPanel = blankPanel;
+        }
+
+        mainPanelScrollPane.getViewport().add(mainPanel);
+    }
+
+    /**
+     * Returns the active XML ProjectType
+     *
+     * @return the active XML ProjectType
+     */
+    public ProjectType getActiveXmlProject()
+    {
+        return activeXmlProject;
+    }
+
+    public MemberPanelCache getMemberPanelCache()
+    {
+        return memberPanelCache;
+    }
+
+    /**
+     * Returns the application instance
+     *
+     * @return the application instance
+     */
+    public QFixMessenger getMessenger()
+    {
+        return messenger;
+    }
+
+    /**
+     * Returns the current ProjectFrame instance
+     *
+     * @return the current ProjectFrame instance
+     */
+    public ProjectDialog getProjectFrame()
+    {
+        return projectDialog;
+    }
+
+    /**
+     * Loads an XML MessageType to the UI
+     *
+     * @param xmlMessageType an XML MessageType
+     */
+    public void loadXmlMessage(MessageType xmlMessageType)
+    {
+        if (selectSession(xmlMessageType.getSession())) {
+            if (selectMessage(xmlMessageType)) {
+                messagePanel.populateXml(xmlMessageType);
+            }
+        }
+    }
+
+    /**
+     * Saves the active XML ProjectType to a file
+     */
+    public void marshallActiveXmlProject()
+    {
+        if (activeProjectFile == null) {
+            JFileChooser jFileChooser = new JFileChooser();
+            jFileChooser.setFileFilter(XmlFileFilter.INSTANCE);
+            jFileChooser.setDialogTitle("Save Project");
+            jFileChooser.setSelectedFile(new File("*.xml"));
+
+            int choice = jFileChooser.showSaveDialog(this);
+            if (choice == JFileChooser.APPROVE_OPTION) {
+                activeProjectFile = jFileChooser.getSelectedFile();
+            }
+            else if (choice == JFileChooser.CANCEL_OPTION) {
+                return;
+            }
+        }
+
+        new MarshallProjectTypeWorker(this, activeXmlProject, activeProjectFile).execute();
+    }
+
+    /**
+     * Saves an XML MessageType to a file
+     *
+     * @param xmlMessageType an XML MessageType
+     */
+    public void marshallXmlMessage(MessageType xmlMessageType)
+    {
+        JFileChooser jFileChooser = new JFileChooser();
+        jFileChooser.setFileFilter(XmlFileFilter.INSTANCE);
+        jFileChooser.setDialogTitle("Export Message");
+        jFileChooser.setSelectedFile(new File("*.xml"));
+
+        int choice = jFileChooser.showSaveDialog(this);
+        if (choice == JFileChooser.APPROVE_OPTION) {
+            File file = jFileChooser.getSelectedFile();
+            new MarshallMessageTypeWorker(this, xmlMessageType, file).execute();
+        }
+    }
+
+    /**
+     * Sets the active XML ProjectType
+     *
+     * @param xmlProjectType an XML ProjectType
+     */
+    public void setActiveXmlProject(ProjectType xmlProjectType, File xmlProjectFile)
+    {
+        this.activeXmlProject = xmlProjectType;
+        this.activeProjectFile = xmlProjectFile;
+        if (projectDialog != null) {
+            projectDialog.dispose();
+            projectDialog = null;
+        }
+
+        if (xmlProjectType != null) {
+            projectTitle = xmlProjectType.getName();
+            loadFrameTitle();
+            saveProjectMenuItem.setEnabled(true);
+            closeProjectMenuItem.setEnabled(true);
+            launchProjectDialog();
+        }
+        else {
+            projectTitle = EMPTY_PROJECT_NAME;
+            loadFrameTitle();
+            saveProjectMenuItem.setEnabled(false);
+            closeProjectMenuItem.setEnabled(false);
+        }
+
+        updateButtons();
+    }
+
+    private GridBagConstraints createRightPanelConstraints()
+    {
+        GridBagConstraints c = new GridBagConstraints();
+        c.fill = GridBagConstraints.HORIZONTAL;
+
+        c.weightx = 0.5;
+        c.weighty = 0.0;
+
+        c.ipadx = 2;
+        c.ipady = 2;
+
+        c.gridx = 0;
+        c.gridy = GridBagConstraints.RELATIVE;
+
+        return c;
+    }
+
+    private void initAppVersionsComboBox()
+    {
+        appVersionsComboBox.setEnabled(false);
+        appVersionsComboBox.addActionListener(new AppVersionsComboBoxActionListener(this));
+    }
+
+    private void initBottomPanel()
+    {
+        MessagesTableModel messagesTableModel = new MessagesTableModel();
+
+        messagesTable = new JTable(messagesTableModel);
+        messagesTable.getColumnModel().getColumn(0).setPreferredWidth(90);
+        messagesTable.getColumnModel().getColumn(1).setPreferredWidth(5);
+        messagesTable.getColumnModel().getColumn(2).setPreferredWidth(75);
+        messagesTable.getColumnModel().getColumn(3).setPreferredWidth(5);
+        messagesTable.getColumnModel().getColumn(4).setPreferredWidth(510);
+
+        messagesTable.setDefaultRenderer(String.class, new MessagesTableCellRender());
+        messagesTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        messagesTable.addMouseListener(new MessagesTableMouseListener(this));
+
+        messenger.getApplication().addMessageListener(messagesTableModel);
+
+        bottomPanelScrollPane = new JScrollPane(messagesTable);
+        bottomPanelScrollPane.setPreferredSize(new Dimension(bottomPanelScrollPane.getPreferredSize().width, 120));
+        bottomPanelScrollPane.getViewport().add(messagesTable);
+    }
+
+    private void initComponents()
+    {
+        setLayout(new BorderLayout());
+
+        initMenuBar();
+        initLeftPanel();
+        initMainPanel();
+        initBottomPanel();
+        initRightPanel();
+
+        initSplitPanes();
+        
+        pack();
+    }
+
+    private void initSplitPanes() {
+        JSplitPane horizontalSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
+                leftPanel,
+                mainPanelScrollPane);
+        horizontalSplit.setDividerLocation(250);
+        horizontalSplit.setOneTouchExpandable(true);
+
+        JSplitPane verticalSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
+                horizontalSplit,
+                bottomPanelScrollPane);
+        verticalSplit.setDividerLocation(400);
+        verticalSplit.setOneTouchExpandable(true);
+
+        add(verticalSplit, BorderLayout.CENTER);
+    }
+
+    private void initFileMenu()
+    {
+        fileMenu = new JMenu("File");
+        fileMenu.setMnemonic('F');
+
+        JMenuItem newProjectMenuItem = new JMenuItem("New Project");
+        newProjectMenuItem.setIcon(IconBuilder.build(getMessenger().getConfig(), IconBuilder.NEW_ICON));
+        newProjectMenuItem.setMnemonic('N');
+        newProjectMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.CTRL_DOWN_MASK));
+        newProjectMenuItem.addActionListener(new NewProjectActionListener(this));
+
+        saveProjectMenuItem = new JMenuItem("Save Project");
+        saveProjectMenuItem.setIcon(IconBuilder.build(getMessenger().getConfig(), IconBuilder.SAVE_ICON));
+        saveProjectMenuItem.setMnemonic('S');
+        saveProjectMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK));
+        saveProjectMenuItem.addActionListener(new SaveProjectActionListener(this));
+        saveProjectMenuItem.setEnabled(false);
+
+        JMenuItem openProjectMenuItem = new JMenuItem("Open Project");
+        openProjectMenuItem.setIcon(IconBuilder.build(getMessenger().getConfig(), IconBuilder.OPEN_ICON));
+        openProjectMenuItem.setMnemonic('O');
+        openProjectMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.CTRL_DOWN_MASK));
+        openProjectMenuItem.addActionListener(new OpenProjectActionListener(this));
+
+        closeProjectMenuItem = new JMenuItem("Close Project");
+        closeProjectMenuItem.setIcon(IconBuilder.build(getMessenger().getConfig(), IconBuilder.CLOSE_ICON));
+        closeProjectMenuItem.setMnemonic('C');
+        closeProjectMenuItem.addActionListener(new CloseProjectActionListener(this));
+        closeProjectMenuItem.setEnabled(false);
+
+        JMenuItem importMessageMenuItem = new JMenuItem("Import Message");
+        importMessageMenuItem.setIcon(IconBuilder.build(getMessenger().getConfig(), IconBuilder.IMPORT_ICON));
+        importMessageMenuItem.setMnemonic('I');
+        importMessageMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_I, InputEvent.CTRL_DOWN_MASK));
+        importMessageMenuItem.addActionListener(new ImportMessageActionListener(this));
+
+        JMenuItem exportMessageMenuItem = new JMenuItem("Export Message");
+        exportMessageMenuItem.setIcon(IconBuilder.build(getMessenger().getConfig(), IconBuilder.EXPORT_ICON));
+        exportMessageMenuItem.addActionListener(new ExportMessageActionListener(this));
+        exportMessageMenuItem.setMnemonic('X');
+        exportMessageMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E, InputEvent.CTRL_DOWN_MASK));
+
+        JMenuItem exitMenuItem = new JMenuItem("Exit");
+        exitMenuItem.setIcon(IconBuilder.build(getMessenger().getConfig(), IconBuilder.EXIT_ICON));
+        exitMenuItem.setMnemonic('x');
+        exitMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, InputEvent.ALT_DOWN_MASK));
+        exitMenuItem.addActionListener(new FrameExitActionListener(this));
+
+        fileMenu.add(newProjectMenuItem);
+        fileMenu.add(saveProjectMenuItem);
+        fileMenu.add(openProjectMenuItem);
+        fileMenu.add(closeProjectMenuItem);
+        fileMenu.addSeparator();
+        fileMenu.add(importMessageMenuItem);
+        fileMenu.add(exportMessageMenuItem);
+        fileMenu.addSeparator();
+        fileMenu.add(exitMenuItem);
+    }
+
+    private void initFrame()
+    {
+        if (messenger.getConfig().isInitiator()) {
+            frameTitle = "QuickFIX Messenger " + VERSION + " (Initiator)";
+        }
+        else {
+            frameTitle = "QuickFIX Messenger " + VERSION + " (Acceptor)";
+        }
+        loadFrameTitle();
+        setIconImage(IconBuilder.build(getMessenger().getConfig(), IconBuilder.APP_ICON).getImage());
+        setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        addWindowListener(new FrameWindowAdapter(this));
+        setMinimumSize(new Dimension(FRAME_MIN_WIDTH, FRAME_MIN_HEIGHT));
+    }
+
+    private void initHelpMenu()
+    {
+        helpMenu = new JMenu("Help");
+        helpMenu.setMnemonic('H');
+
+        JMenuItem helpMenuItem = new JMenuItem("Help");
+        helpMenuItem.setIcon(IconBuilder.build(getMessenger().getConfig(), IconBuilder.HELP_ICON));
+        helpMenuItem.setMnemonic('H');
+        helpMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F2, InputEvent.SHIFT_DOWN_MASK));
+        helpMenuItem.addActionListener(new HelpActionListener(this));
+
+        JMenuItem aboutMenuItem = new JMenuItem("About");
+        aboutMenuItem.setMnemonic('A');
+        aboutMenuItem.addActionListener(new AboutActionListener(this));
+
+        helpMenu.add(helpMenuItem);
+        helpMenu.add(aboutMenuItem);
+    }
+
+    private void initLeftPanel()
+    {
+        leftPanel = new JPanel();
+        leftPanel.setLayout(new BoxLayout(leftPanel, BoxLayout.Y_AXIS));
+
+        // Sessions Panel
+        sessionsList = new JList<Session>();
+        appVersionsComboBox = new JComboBox<String>(QFixMessengerConstants.FIXT_APP_VERSIONS);
+        JPanel sessionsPanel = new JPanel();
+        sessionsPanel.setBorder(new TitledBorder("Current Sessions"));
+        sessionsPanel.setLayout(new BorderLayout());
+
+        initSessionsList();
+        JScrollPane sessionsListScrollPane = new JScrollPane(sessionsList);
+        sessionsListScrollPane.setPreferredSize(new Dimension(LEFT_PANEL_WIDTH, 120));
+        sessionsListScrollPane.setMaximumSize(sessionsListScrollPane.getPreferredSize());
+
+        initAppVersionsComboBox();
+        JPanel appVersionsPanel = new JPanel();
+        appVersionsPanel.setLayout(new GridLayout(2, 1));
+        appVersionsPanel.add(new JLabel("ApplVerID: "));
+        appVersionsPanel.add(appVersionsComboBox);
+
+        sessionsPanel.add(sessionsListScrollPane, BorderLayout.CENTER);
+        sessionsPanel.add(appVersionsPanel, BorderLayout.SOUTH);
+
+        // Messages Panel
+        messagesList = new JList<Message>();
+
+        recentMessagesMap = new HashMap<>();
+        recentMessagesListModel = new DefaultListModel<Message>();
+        recentMessagesList = new JList<Message>(recentMessagesListModel);
+
+        JPanel messagesPanel = new JPanel();
+        messagesPanel.setBorder(new TitledBorder("Available Messages"));
+        messagesPanel.setLayout(new BoxLayout(messagesPanel, BoxLayout.Y_AXIS));
+
+        initMessagesList();
+
+        JScrollPane messagesListScrollPane = new JScrollPane(messagesList);
+        messagesListScrollPane.setPreferredSize(new Dimension(LEFT_PANEL_WIDTH, 300));
+
+        JScrollPane recentMessagesListScrollPane = new JScrollPane(recentMessagesList);
+        messagesTabPane = new JTabbedPane();
+        messagesTabPane.setPreferredSize(new Dimension(LEFT_PANEL_WIDTH, 300));
+        messagesTabPane.addTab("All", messagesListScrollPane);
+        messagesTabPane.addTab("Recent", recentMessagesListScrollPane);
+
+        messagesPanel.add(messagesTabPane);
+
+        leftPanel.add(sessionsPanel);
+        leftPanel.add(messagesPanel);
+    }
+
+    private void initMainPanel()
+    {
+        mainPanelScrollPane = new JScrollPane();
+        add(mainPanelScrollPane, BorderLayout.CENTER);
+    }
+
+    private void initMenuBar()
+    {
+        menuBar = new JMenuBar();
+
+        initFileMenu();
+        initSessionMenu();
+        initHelpMenu();
+        initWindowMenu();
+
+        menuBar.add(fileMenu);
+        menuBar.add(sessionMenu);
+        menuBar.add(helpMenu);
+        menuBar.add(windowMenu);
+
+        setJMenuBar(menuBar);
+    }
+
+    private void initMessagesList()
+    {
+        messagesList.setCellRenderer(new MessagesListCellRenderer());
+        messagesList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        messagesList.getSelectionModel().addListSelectionListener(new MessagesListSelectionListener(this));
+        messagesList.addMouseListener(new MessagesListMouseAdapter(this));
+
+        recentMessagesList.setCellRenderer(new MessagesListCellRenderer());
+        recentMessagesList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        recentMessagesList.getSelectionModel().addListSelectionListener(new RecentMessagesListSelectionListener(this));
+        recentMessagesList.addMouseListener(new RecentMessagesListMouseAdapter(this));
+    }
+
+    private void initRightPanel()
+    {
+        rightPanel = new JPanel();
+        rightPanel.setLayout(new BorderLayout());
+
+        JPanel optionsPanel = new JPanel();
+        optionsPanel.setBorder(new TitledBorder("Options"));
+        optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.Y_AXIS));
+
+        requiredCheckBox = new JCheckBox("Required Only", true);
+        requiredCheckBox.addItemListener(new ItemListener()
+        {
+            @Override public void itemStateChanged(ItemEvent e)
+            {
+                if (e.getStateChange() == ItemEvent.SELECTED) {
+                    isRequiredOnly = true;
+                }
+                else {
+                    isRequiredOnly = false;
+                }
+
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Selected isRequiredOnly = " + isRequiredOnly);
+                }
+                displayMainPanel();
+            }
+        });
+
+        modifyHeaderCheckBox = new JCheckBox("Modify Header", false);
+        modifyHeaderCheckBox.addItemListener(new ItemListener()
+        {
+            @Override public void itemStateChanged(ItemEvent e)
+            {
+                if (e.getStateChange() == ItemEvent.SELECTED) {
+                    isModifyHeader = true;
+                }
+                else {
+                    isModifyHeader = false;
+                }
+
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Selected isModifyHeader = " + isModifyHeader);
+                }
+                displayMainPanel();
+            }
+        });
+
+        modifyTrailerCheckBox = new JCheckBox("Modify Trailer", false);
+        modifyTrailerCheckBox.addItemListener(new ItemListener()
+        {
+            @Override public void itemStateChanged(ItemEvent e)
+            {
+                if (e.getStateChange() == ItemEvent.SELECTED) {
+                    isModifyTrailer = true;
+                }
+                else {
+                    isModifyTrailer = false;
+                }
+
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Selected isModifyTrailer = " + isModifyTrailer);
+                }
+                displayMainPanel();
+            }
+        });
+
+        optionsPanel.add(requiredCheckBox);
+        optionsPanel.add(modifyHeaderCheckBox);
+        optionsPanel.add(modifyTrailerCheckBox);
+
+        JPanel sendPanel = new JPanel();
+        sendPanel.setLayout(new GridBagLayout());
+
+        previewBeforeSendCheckBox = new JCheckBox("Preview Before Sending", false);
+        previewBeforeSendCheckBox.addItemListener(new ItemListener()
+        {
+            @Override public void itemStateChanged(ItemEvent e)
+            {
+                if (e.getStateChange() == ItemEvent.SELECTED) {
+                    isPreviewBeforeSend = true;
+                }
+                else {
+                    isPreviewBeforeSend = false;
+                }
+
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Selected isPreviewBeforeSend = " + isPreviewBeforeSend);
+                }
+            }
+        });
 
 		ImageIcon destroyImageIcon = IconBuilder.build(getMessenger()
 				.getConfig(), IconBuilder.DESTROY_ICON);
@@ -917,375 +803,312 @@ public class QFixMessengerFrame extends JFrame
 		destroyButton.setToolTipText("Destroys the message");
 		destroyButton.setEnabled(false);
 
-		ImageIcon addImageIcon = IconBuilder.build(getMessenger().getConfig(),
-				IconBuilder.ADD_ICON);
-		addButton = new JButton(addImageIcon);
-		addButton.addActionListener(new AddMessageActionListener(this));
-		addButton.setToolTipText("Adds the message to the current project");
-		addButton.setEnabled(false);
+        ImageIcon addImageIcon = IconBuilder.build(getMessenger().getConfig(), IconBuilder.ADD_ICON);
+        addButton = new JButton(addImageIcon);
+        addButton.addActionListener(new AddMessageActionListener(this));
+        addButton.setToolTipText("Adds the message to the current project");
+        addButton.setEnabled(false);
 
-		ImageIcon sendImageIcon = IconBuilder.build(getMessenger().getConfig(),
-				IconBuilder.SEND_ICON);
-		sendButton = new JButton(sendImageIcon);
-		sendButton.addActionListener(new SendActionListener(this));
-		sendButton.setToolTipText("Sends the message across the session");
-		sendButton.setEnabled(false);
+        ImageIcon sendImageIcon = IconBuilder.build(getMessenger().getConfig(), IconBuilder.SEND_ICON);
+        sendButton = new JButton(sendImageIcon);
+        sendButton.addActionListener(new SendActionListener(this));
+        sendButton.setToolTipText("Sends the message across the session");
+        sendButton.setEnabled(false);
 
 		sendPanel.add(destroyButton, createRightPanelConstraints());
 		sendPanel.add(addButton, createRightPanelConstraints());
 		sendPanel.add(sendButton, createRightPanelConstraints());
 		sendPanel.add(previewBeforeSendCheckBox, createRightPanelConstraints());
 
-		rightPanel.add(optionsPanel, BorderLayout.NORTH);
-		rightPanel.add(sendPanel, BorderLayout.SOUTH);
-		add(rightPanel, BorderLayout.EAST);
-	}
+        rightPanel.add(optionsPanel, BorderLayout.NORTH);
+        rightPanel.add(sendPanel, BorderLayout.SOUTH);
+        add(rightPanel, BorderLayout.EAST);
+    }
 
-	private void initSessionMenu()
-	{
-		sessionMenu = new JMenu("Session");
-		sessionMenu.setMnemonic('S');
+    private void initSessionMenu()
+    {
+        sessionMenu = new JMenu("Session");
+        sessionMenu.setMnemonic('S');
 
-		JMenu currentSessionMenu;
-		JCheckBoxMenuItem logonMenuItem;
-		JMenuItem resetMenuItem;
-		JMenuItem statusMenuItem;
-		for (SessionID sessionId : messenger.getConnector().getSessions())
-		{
-			Session session = Session.lookupSession(sessionId);
-			currentSessionMenu = new JMenu(QFixUtil.getSessionName(sessionId));
+        JMenu currentSessionMenu;
+        JCheckBoxMenuItem logonMenuItem;
+        JMenuItem resetMenuItem;
+        JMenuItem statusMenuItem;
+        JMenuItem seqnumMenuItem;
 
-			logonMenuItem = new JCheckBoxMenuItem("Logon");
-			logonMenuItem
-					.addItemListener(new LogonSessionItemListener(session));
-			if (session.isLoggedOn())
-			{
-				logonMenuItem.setSelected(true);
-			} else
-			{
-				logonMenuItem.setSelected(false);
-			}
-			session.addStateListener(new LogonSessionMenuItemSessionStateListener(
-					logonMenuItem));
+        for (SessionID sessionId : messenger.getConnector().getSessions()) {
+            Session session = Session.lookupSession(sessionId);
+            currentSessionMenu = new JMenu(QFixUtil.getSessionName(sessionId));
 
-			resetMenuItem = new JMenuItem("Reset");
-			resetMenuItem.addActionListener(new ResetSessionActionListener(
-					this, session));
+            logonMenuItem = new JCheckBoxMenuItem("Logon");
+            logonMenuItem.addItemListener(new LogonSessionItemListener(session));
+            session.addStateListener(new LogonSessionMenuItemSessionStateListener(logonMenuItem));
 
-			statusMenuItem = new JMenuItem("Status");
-			statusMenuItem.addActionListener(new SessionStatusActionListener(
-					this, session));
+            resetMenuItem = new JMenuItem("Reset");
+            resetMenuItem.addActionListener(new ResetSessionActionListener(this, session));
 
-			currentSessionMenu.add(logonMenuItem);
-			currentSessionMenu.add(resetMenuItem);
-			currentSessionMenu.add(statusMenuItem);
-			sessionMenu.add(currentSessionMenu);
-		}
+            statusMenuItem = new JMenuItem("Status");
+            statusMenuItem.addActionListener(new SessionStatusActionListener(this, session));
 
-		JMenuItem logonAllSessionsMenuItem = new JMenuItem(
-				"All Sessions - Logon");
-		logonAllSessionsMenuItem.setIcon(IconBuilder.build(getMessenger()
-				.getConfig(), IconBuilder.LOGON_ICON));
-		logonAllSessionsMenuItem.setMnemonic('n');
-		logonAllSessionsMenuItem.setAccelerator(KeyStroke.getKeyStroke(
-				KeyEvent.VK_N, InputEvent.CTRL_DOWN_MASK));
-		logonAllSessionsMenuItem
-				.addActionListener(new LogonAllSessionsActionListener(this));
+            seqnumMenuItem = new JMenuItem("Set Sequence Numbers");
+            seqnumMenuItem.addActionListener(new SessionSetSeqNumActionListener(this, session));
 
-		JMenuItem logoffAllSessionsMenuItem = new JMenuItem(
-				"All Sessions - Logoff");
-		logoffAllSessionsMenuItem.setIcon(IconBuilder.build(getMessenger()
-				.getConfig(), IconBuilder.LOGOFF_ICON));
-		logoffAllSessionsMenuItem.setMnemonic('f');
-		logoffAllSessionsMenuItem.setAccelerator(KeyStroke.getKeyStroke(
-				KeyEvent.VK_F, InputEvent.CTRL_DOWN_MASK));
-		logoffAllSessionsMenuItem
-				.addActionListener(new LogoffAllSessionsActionListener(this));
+            session.addStateListener(new SessionMenuItemSessionStateListener(seqnumMenuItem, resetMenuItem));
 
-		JMenuItem resetAllSessionsMenuItem = new JMenuItem(
-				"All Sessions - Reset");
-		resetAllSessionsMenuItem.setIcon(IconBuilder.build(getMessenger()
-				.getConfig(), IconBuilder.RESET_ICON));
-		resetAllSessionsMenuItem.setMnemonic('R');
-		resetAllSessionsMenuItem.setAccelerator(KeyStroke.getKeyStroke(
-				KeyEvent.VK_R, InputEvent.CTRL_DOWN_MASK));
-		resetAllSessionsMenuItem
-				.addActionListener(new ResetAllSessionsActionListener(this));
+            if (session.isLoggedOn()) {
+                logonMenuItem.setSelected(true);
+                seqnumMenuItem.setEnabled(false);
+                resetMenuItem.setEnabled(false);
+            }
+            else {
+                logonMenuItem.setSelected(false);
+                seqnumMenuItem.setEnabled(true);
+                resetMenuItem.setEnabled(false);
+            }
 
-		sessionMenu.addSeparator();
-		sessionMenu.add(logonAllSessionsMenuItem);
-		sessionMenu.add(logoffAllSessionsMenuItem);
-		sessionMenu.add(resetAllSessionsMenuItem);
-	}
+            currentSessionMenu.add(logonMenuItem);
+            currentSessionMenu.add(resetMenuItem);
+            currentSessionMenu.add(statusMenuItem);
+            currentSessionMenu.add(seqnumMenuItem);
 
-	private void initSessionsList()
-	{
-		sessionsList = new JList<Session>();
+            sessionMenu.add(currentSessionMenu);
+        }
 
-		List<SessionID> sessionIds = messenger.getConnector().getSessions();
-		List<Session> sessions = new ArrayList<Session>(sessionIds.size());
-		for (SessionID sessionId : sessionIds)
-		{
-			Session session = Session.lookupSession(sessionId);
-			session.addStateListener(new SessionsListSessionStateListener(
-					sessionsList));
-			sessions.add(session);
-		}
+        JMenuItem logonAllSessionsMenuItem = new JMenuItem("All Sessions - Logon");
+        logonAllSessionsMenuItem.setIcon(IconBuilder.build(getMessenger().getConfig(), IconBuilder.LOGON_ICON));
+        logonAllSessionsMenuItem.setMnemonic('n');
+        logonAllSessionsMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.CTRL_DOWN_MASK));
+        logonAllSessionsMenuItem.addActionListener(new LogonAllSessionsActionListener(this));
 
-		Collections.sort(sessions, new Comparator<Session>()
-		{
-			@Override
-			public int compare(Session o1, Session o2)
-			{
-				return o1.getSessionID().getBeginString()
-						.compareTo(o2.getSessionID().getBeginString());
-			}
-		});
+        JMenuItem logoffAllSessionsMenuItem = new JMenuItem("All Sessions - Logoff");
+        logoffAllSessionsMenuItem.setIcon(IconBuilder.build(getMessenger().getConfig(), IconBuilder.LOGOFF_ICON));
+        logoffAllSessionsMenuItem.setMnemonic('f');
+        logoffAllSessionsMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, InputEvent.CTRL_DOWN_MASK));
+        logoffAllSessionsMenuItem.addActionListener(new LogoffAllSessionsActionListener(this));
 
-		sessionsList.setListData(sessions.toArray(new Session[] {}));
-		sessionsList.setCellRenderer(new SessionsListCellRenderer());
-		sessionsList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		sessionsList.getSelectionModel().addListSelectionListener(
-				new SessionsListSelectionListener(this));
-		sessionsList.addMouseListener(new SessionsListMouseAdapter(this));
-	}
+        JMenuItem resetAllSessionsMenuItem = new JMenuItem("All Sessions - Reset");
+        resetAllSessionsMenuItem.setIcon(IconBuilder.build(getMessenger().getConfig(), IconBuilder.RESET_ICON));
+        resetAllSessionsMenuItem.setMnemonic('R');
+        resetAllSessionsMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, InputEvent.CTRL_DOWN_MASK));
+        resetAllSessionsMenuItem.addActionListener(new ResetAllSessionsActionListener(this));
 
-	private void initWindowMenu()
-	{
-		windowMenu = new JMenu("Window");
-		windowMenu.setMnemonic('W');
+        sessionMenu.addSeparator();
+        sessionMenu.add(logonAllSessionsMenuItem);
+        sessionMenu.add(logoffAllSessionsMenuItem);
+        sessionMenu.add(resetAllSessionsMenuItem);
+    }
 
-		JMenuItem projectWindowMenuItem = new JMenuItem("Project Window");
-		JMenuItem logfileWindowMenuItem = new JMenuItem("Logfile Window");
+    private void initSessionsList()
+    {
+        sessionsList = new JList<Session>();
 
-		projectWindowMenuItem.setIcon(IconBuilder.build(getMessenger()
-				.getConfig(), IconBuilder.WINDOW_ICON));
-		projectWindowMenuItem.setMnemonic('P');
-		projectWindowMenuItem.setAccelerator(KeyStroke.getKeyStroke(
-				KeyEvent.VK_P, InputEvent.CTRL_DOWN_MASK));
-		projectWindowMenuItem
-				.addActionListener(new ProjectWindowActionListener(this));
+        List<SessionID> sessionIds = messenger.getConnector().getSessions();
+        List<Session> sessions = new ArrayList<Session>(sessionIds.size());
+        for (SessionID sessionId : sessionIds) {
+            Session session = Session.lookupSession(sessionId);
+            session.addStateListener(new SessionsListSessionStateListener(sessionsList));
+            sessions.add(session);
+        }
 
-		logfileWindowMenuItem.setIcon(IconBuilder.build(getMessenger()
-				.getConfig(), IconBuilder.WINDOW_ICON));
-		logfileWindowMenuItem.setMnemonic('L');
-		logfileWindowMenuItem.setAccelerator(KeyStroke.getKeyStroke(
-				KeyEvent.VK_L, InputEvent.CTRL_DOWN_MASK));
-		logfileWindowMenuItem
-				.addActionListener(new LogfileWindowActionListener(this));
+        Collections.sort(sessions, new Comparator<Session>()
+        {
+            @Override public int compare(Session o1, Session o2)
+            {
+                return o1.getSessionID().getBeginString().compareTo(o2.getSessionID().getBeginString());
+            }
+        });
 
-		windowMenu.add(logfileWindowMenuItem);
-		windowMenu.add(projectWindowMenuItem);
-	}
+        sessionsList.setListData(sessions.toArray(new Session[]{}));
+        sessionsList.setCellRenderer(new SessionsListCellRenderer());
+        sessionsList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        sessionsList.getSelectionModel().addListSelectionListener(new SessionsListSelectionListener(this));
+        sessionsList.addMouseListener(new SessionsListMouseAdapter(this));
+    }
 
-	private void launchProjectDialog()
-	{
-		if (projectDialog == null || !projectDialog.isDisplayable())
-		{
-			projectDialog = new ProjectDialog(this, activeXmlProject);
-			projectDialog.launch();
-		} else
-		{
-			projectDialog.requestFocus();
-		}
-	}
+    private void initWindowMenu()
+    {
+        windowMenu = new JMenu("Window");
+        windowMenu.setMnemonic('W');
 
-	private void launchLogfileDialog()
-	{
-		String beginStr = sessionsList.getSelectedValue().getSessionID()
-				.getBeginString();
+        JMenuItem projectWindowMenuItem = new JMenuItem("Project Window");
+        JMenuItem logfileWindowMenuItem = new JMenuItem("Logfile Window");
 
-		if (logfileDialog == null || !logfileDialog.isDisplayable())
-		{
+        projectWindowMenuItem.setIcon(IconBuilder.build(getMessenger().getConfig(), IconBuilder.WINDOW_ICON));
+        projectWindowMenuItem.setMnemonic('P');
+        projectWindowMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P, InputEvent.CTRL_DOWN_MASK));
+        projectWindowMenuItem.addActionListener(new ProjectWindowActionListener(this));
 
-			logfileDialog = new LogfileDialog(this);
-			logfileDialog.launch(beginStr);
-		} else
-		{
-			logfileDialog.loadLogfile(beginStr);
-			logfileDialog.requestFocus();
-		}
-	}
+        logfileWindowMenuItem.setIcon(IconBuilder.build(getMessenger().getConfig(), IconBuilder.WINDOW_ICON));
+        logfileWindowMenuItem.setMnemonic('L');
+        logfileWindowMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_L, InputEvent.CTRL_DOWN_MASK));
+        logfileWindowMenuItem.addActionListener(new LogfileWindowActionListener(this));
 
-	private void loadFrameTitle()
-	{
-		setTitle(frameTitle + " - " + projectTitle);
-	}
+        windowMenu.add(logfileWindowMenuItem);
+        windowMenu.add(projectWindowMenuItem);
+    }
 
-	private void loadMessagesList()
-	{
-		if (activeDictionary != null)
-		{
-			List<Message> messages = new ArrayList<Message>();
-			messages.addAll(activeDictionary.getMessages().values());
-			Collections.sort(messages);
+    private void launchProjectDialog()
+    {
+        if (projectDialog == null || !projectDialog.isDisplayable()) {
+            projectDialog = new ProjectDialog(this, activeXmlProject);
+            projectDialog.launch();
+        }
+        else {
+            projectDialog.requestFocus();
+        }
+    }
 
-			messages.add(0, freeTextMessage);
+    private void launchLogfileDialog()
+    {
+        String beginStr = sessionsList.getSelectedValue().getSessionID().getBeginString();
 
-			messagesList.setListData(messages.toArray(new Message[] {}));
+        if (logfileDialog == null || !logfileDialog.isDisplayable()) {
 
-			DefaultListModel<Message> listModel = recentMessagesMap
-					.get(activeDictionary.getFullVersion());
-			if (listModel != null)
-			{
-				recentMessagesListModel = listModel;
-			} else
-			{
-				recentMessagesListModel = new DefaultListModel<>();
-			}
+            logfileDialog = new LogfileDialog(this);
+            logfileDialog.launch(beginStr);
+        }
+        else {
+            logfileDialog.loadLogfile(beginStr);
+            logfileDialog.requestFocus();
+        }
+    }
 
-		} else
-		{
-			recentMessagesListModel = new DefaultListModel<Message>();
-			messagesList.setListData(new Message[] {});
-		}
+    private void loadFrameTitle()
+    {
+        setTitle(frameTitle + " - " + projectTitle);
+    }
 
-		recentMessagesList.setModel(recentMessagesListModel);
+    private void loadMessagesList()
+    {
+        if (activeDictionary != null) {
+            List<Message> messages = new ArrayList<Message>();
+            messages.addAll(activeDictionary.getMessages().values());
+            Collections.sort(messages);
 
-	}
+            messages.add(0, freeTextMessage);
 
-	/*
-	 * Position the frame at the center of the screen
-	 */
-	private void positionFrame()
-	{
-		Toolkit defaultToolkit = Toolkit.getDefaultToolkit();
-		Dimension screenSize = defaultToolkit.getScreenSize();
-		int screenHeight = screenSize.height;
-		int screenWidth = screenSize.width;
-		setSize(screenWidth / 2, screenHeight / 2);
-		setLocation(screenWidth / 4, screenHeight / 4);
-	}
+            messagesList.setListData(messages.toArray(new Message[]{}));
 
-	private boolean selectMessage(MessageType xmlMessageType)
-	{
-		boolean isRecognizedMessage = false;
-		ListModel<Message> listModel = messagesList.getModel();
-		for (int i = 0; i < listModel.getSize(); i++)
-		{
-			Message message = listModel.getElementAt(i);
-			if (message.getMsgType().equals(xmlMessageType.getMsgType()))
-			{
-				messagesList.setSelectedIndex(i);
+            DefaultListModel<Message> listModel = recentMessagesMap.get(activeDictionary.getFullVersion());
+            if (listModel != null) {
+                recentMessagesListModel = listModel;
+            }
+            else {
+                recentMessagesListModel = new DefaultListModel<>();
+            }
 
-				if (xmlMessageType.isIsRequiredOnly())
-				{
-					requiredCheckBox.setSelected(true);
-				} else
-				{
-					requiredCheckBox.setSelected(false);
-				}
+        }
+        else {
+            recentMessagesListModel = new DefaultListModel<Message>();
+            messagesList.setListData(new Message[]{});
+        }
 
-				if (xmlMessageType.getHeader() != null
-						&& xmlMessageType.getHeader().getField() != null
-						&& xmlMessageType.getHeader().getField().isEmpty())
-				{
-					modifyHeaderCheckBox.setSelected(true);
-				} else
-				{
-					modifyHeaderCheckBox.setSelected(false);
-				}
+        recentMessagesList.setModel(recentMessagesListModel);
 
-				if (xmlMessageType.getTrailer() != null
-						&& xmlMessageType.getTrailer().getField() != null
-						&& xmlMessageType.getTrailer().getField().isEmpty())
-				{
-					modifyTrailerCheckBox.setSelected(true);
-				} else
-				{
-					modifyTrailerCheckBox.setSelected(false);
-				}
+    }
 
-				isRecognizedMessage = true;
-			}
-		}
+    /*
+     * Position the frame at the center of the screen
+     */
+    private void positionFrame()
+    {
+        Toolkit defaultToolkit = Toolkit.getDefaultToolkit();
+        Dimension screenSize = defaultToolkit.getScreenSize();
+        int screenHeight = screenSize.height;
+        int screenWidth = screenSize.width;
+        setSize(screenWidth / 2, screenHeight / 2);
+        setLocation(screenWidth / 4, screenHeight / 4);
+    }
 
-		if (!isRecognizedMessage)
-		{
-			logger.error("Unrecognized message: ", xmlMessageType.getName()
-					+ " (" + xmlMessageType.getMsgType() + ")");
-			JOptionPane.showMessageDialog(
-					this,
-					"Unable to import message from unrecognized message: "
-							+ xmlMessageType.getName() + " ("
-							+ xmlMessageType.getMsgType() + ")", "Error",
-					JOptionPane.ERROR_MESSAGE);
-			return false;
-		}
+    private boolean selectMessage(MessageType xmlMessageType)
+    {
+        boolean isRecognizedMessage = false;
+        ListModel<Message> listModel = messagesList.getModel();
+        for (int i = 0; i < listModel.getSize(); i++) {
+            Message message = listModel.getElementAt(i);
+            if (message.getMsgType().equals(xmlMessageType.getMsgType())) {
+                messagesList.setSelectedIndex(i);
 
-		return true;
-	}
+                if (xmlMessageType.isIsRequiredOnly()) {
+                    requiredCheckBox.setSelected(true);
+                }
+                else {
+                    requiredCheckBox.setSelected(false);
+                }
 
-	private boolean selectSession(SessionType xmlSessionType)
-	{
-		boolean isRecognizedSession = false;
-		ListModel<Session> listModel = sessionsList.getModel();
-		for (int i = 0; i < listModel.getSize(); i++)
-		{
-			Session session = listModel.getElementAt(i);
-			if (QFixUtil.getSessionName(session.getSessionID()).equals(
-					xmlSessionType.getName()))
-			{
-				sessionsList.setSelectedIndex(i);
-				isRecognizedSession = true;
-			}
-		}
+                if (xmlMessageType.getHeader() != null && xmlMessageType.getHeader().getField() != null && xmlMessageType.getHeader().getField().isEmpty()) {
+                    modifyHeaderCheckBox.setSelected(true);
+                }
+                else {
+                    modifyHeaderCheckBox.setSelected(false);
+                }
 
-		if (isRecognizedSession)
-		{
-			if (isFixTSession)
-			{
-				if (xmlSessionType.getAppVersionId() != null
-						&& !xmlSessionType.getAppVersionId().isEmpty())
-				{
-					boolean isRecognizedAppVersionId = false;
-					ComboBoxModel<String> comboBoxModel = appVersionsComboBox
-							.getModel();
-					for (int i = 0; i < comboBoxModel.getSize(); i++)
-					{
-						if (comboBoxModel.getElementAt(i).equals(
-								xmlSessionType.getAppVersionId()))
-						{
-							appVersionsComboBox.setSelectedIndex(i);
-							isRecognizedAppVersionId = true;
-						}
-					}
+                if (xmlMessageType.getTrailer() != null && xmlMessageType.getTrailer().getField() != null && xmlMessageType.getTrailer().getField().isEmpty()) {
+                    modifyTrailerCheckBox.setSelected(true);
+                }
+                else {
+                    modifyTrailerCheckBox.setSelected(false);
+                }
 
-					if (!isRecognizedAppVersionId)
-					{
-						logger.error("Unrecognized AppVersionId: "
-								+ xmlSessionType.getAppVersionId());
-						JOptionPane.showMessageDialog(
-								this,
-								"Unrecognized AppVersionId: "
-										+ xmlSessionType.getAppVersionId(),
-								"Error", JOptionPane.ERROR_MESSAGE);
-						return false;
-					}
-				} else
-				{
-					logger.error("FIXT session ", xmlSessionType.getName()
-							+ " has no AppVersionId");
-					JOptionPane.showMessageDialog(this,
-							"Unable to find AppVersionId for FIXT session: "
-									+ xmlSessionType.getName(), "Error",
-							JOptionPane.ERROR_MESSAGE);
-					return false;
-				}
-			}
+                isRecognizedMessage = true;
+            }
+        }
 
-		} else
-		{
-			logger.error("Unrecognized session: ", xmlSessionType.getName());
-			JOptionPane.showMessageDialog(this, "Unable to"
-					+ " import message from unrecognized session: "
-					+ xmlSessionType.getName(), "Error",
-					JOptionPane.ERROR_MESSAGE);
-			return false;
-		}
+        if (!isRecognizedMessage) {
+            logger.error("Unrecognized message: ", xmlMessageType.getName() + " (" + xmlMessageType.getMsgType() + ")");
+            JOptionPane.showMessageDialog(this, "Unable to import message from unrecognized message: " + xmlMessageType.getName() + " (" + xmlMessageType.getMsgType() + ")", "Error", JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
 
-		return true;
-	}
+        return true;
+    }
+
+    private boolean selectSession(SessionType xmlSessionType)
+    {
+        boolean isRecognizedSession = false;
+        ListModel<Session> listModel = sessionsList.getModel();
+        for (int i = 0; i < listModel.getSize(); i++) {
+            Session session = listModel.getElementAt(i);
+            if (QFixUtil.getSessionName(session.getSessionID()).equals(xmlSessionType.getName())) {
+                sessionsList.setSelectedIndex(i);
+                isRecognizedSession = true;
+            }
+        }
+
+        if (isRecognizedSession) {
+            if (isFixTSession) {
+                if (xmlSessionType.getAppVersionId() != null && !xmlSessionType.getAppVersionId().isEmpty()) {
+                    boolean isRecognizedAppVersionId = false;
+                    ComboBoxModel<String> comboBoxModel = appVersionsComboBox.getModel();
+                    for (int i = 0; i < comboBoxModel.getSize(); i++) {
+                        if (comboBoxModel.getElementAt(i).equals(xmlSessionType.getAppVersionId())) {
+                            appVersionsComboBox.setSelectedIndex(i);
+                            isRecognizedAppVersionId = true;
+                        }
+                    }
+
+                    if (!isRecognizedAppVersionId) {
+                        logger.error("Unrecognized AppVersionId: " + xmlSessionType.getAppVersionId());
+                        JOptionPane.showMessageDialog(this, "Unrecognized AppVersionId: " + xmlSessionType.getAppVersionId(), "Error", JOptionPane.ERROR_MESSAGE);
+                        return false;
+                    }
+                }
+                else {
+                    logger.error("FIXT session ", xmlSessionType.getName() + " has no AppVersionId");
+                    JOptionPane.showMessageDialog(this, "Unable to find AppVersionId for FIXT session: " + xmlSessionType.getName(), "Error", JOptionPane.ERROR_MESSAGE);
+                    return false;
+                }
+            }
+
+        }
+        else {
+            logger.error("Unrecognized session: ", xmlSessionType.getName());
+            JOptionPane.showMessageDialog(this, "Unable to" + " import message from unrecognized session: " + xmlSessionType.getName(), "Error", JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+
+        return true;
+    }
 
 	private void updateButtons()
 	{
@@ -1308,913 +1131,733 @@ public class QFixMessengerFrame extends JFrame
 		}
 	}
 
-	private void updateLogFile(String beginStr)
-	{
-		if (logfileDialog != null && logfileDialog.isVisible())
-		{
-			logfileDialog.loadLogfile(beginStr);
-		}
-	}
-
-	public static class XmlFileFilter extends FileFilter
-	{
-		public static final XmlFileFilter INSTANCE = new XmlFileFilter();
-
-		@Override
-		public boolean accept(File f)
-		{
-			if (f.isDirectory())
-			{
-				return true;
-			}
-			return f.getName().endsWith(".xml");
-		}
-
-		@Override
-		public String getDescription()
-		{
-			return "XML Files (*.xml)";
-		}
-	}
-
-	private static class AddMessageActionListener implements ActionListener
-	{
-		private QFixMessengerFrame frame;
-
-		public AddMessageActionListener(QFixMessengerFrame frame)
-		{
-			this.frame = frame;
-		}
-
-		@Override
-		public void actionPerformed(ActionEvent e)
-		{
-			if (!frame.activeMessage.equals(frame.freeTextMessage))
-			{
-				MessageType xmlMessageType = frame.messagePanel.getXmlMember();
-				ProjectType xmlProjectType = frame.getActiveXmlProject();
-				xmlProjectType.getMessages().getMessage().add(xmlMessageType);
-				frame.projectDialog.updateMessageAdded(xmlMessageType);
-			} else
-			{
-				JOptionPane.showMessageDialog(frame,
-						"Projects do not support free text messages!", "Error",
-						JOptionPane.WARNING_MESSAGE);
-			}
-		}
-	}
-
-	private static class AppVersionsComboBoxActionListener implements
-			ActionListener
-	{
-		private QFixMessengerFrame frame;
-
-		public AppVersionsComboBoxActionListener(QFixMessengerFrame frame)
-		{
-			this.frame = frame;
-		}
-
-		@Override
-		public void actionPerformed(ActionEvent e)
-		{
-			String appVersion = (String) frame.appVersionsComboBox
-					.getSelectedItem();
-			try
-			{
-				String fixDictionaryLocation = frame.messenger.getConfig()
-						.getFixDictionaryLocation(appVersion);
-				frame.activeDictionary = frame.messenger.getParser().parse(
-						getClass().getResourceAsStream(fixDictionaryLocation));
-			} catch (FixParsingException ex)
-			{
-				JOptionPane.showMessageDialog(frame, "An error occured while"
-						+ " parsing the FIX dictionary: " + ex, "Error",
-						JOptionPane.ERROR_MESSAGE);
-			}
-
-			if (logger.isDebugEnabled())
-			{
-				logger.debug("Selected dictionary " + frame.activeDictionary);
-			}
-			frame.loadMessagesList();
-		}
-	}
-
-	private static class DestroyMessageActionListener implements ActionListener
-	{
-		private QFixMessengerFrame frame;
-
-		private DestroyMessageActionListener(QFixMessengerFrame frame)
-		{
-			this.frame = frame;
-		}
-
-		@Override
-		public void actionPerformed(ActionEvent e)
-		{
-			int choice = JOptionPane.showConfirmDialog(frame,
-					"Clear all saved fields?", "Destroy Message?",
-					JOptionPane.YES_NO_OPTION);
-			if (choice == JOptionPane.YES_OPTION)
-			{
-				frame.messagePanel = null;
-				frame.getMemberPanelCache().clear();
-				frame.displayMainPanel();
-			}
-		}
-	}
-
-	private static class ExportMessageActionListener implements ActionListener
-	{
-		private QFixMessengerFrame frame;
-
-		public ExportMessageActionListener(QFixMessengerFrame frame)
-		{
-			this.frame = frame;
-		}
-
-		@Override
-		public void actionPerformed(ActionEvent e)
-		{
-			if (frame.activeMessage != null)
-			{
-				if (!frame.activeMessage.equals(frame.freeTextMessage))
-				{
-					MessageType xmlMessageType = frame.messagePanel
-							.getXmlMember();
-					frame.marshallXmlMessage(xmlMessageType);
-				} else
-				{
-					JOptionPane.showMessageDialog(frame,
-							"Free text message cannot be exported!", "Error",
-							JOptionPane.WARNING_MESSAGE);
-				}
-			} else
-			{
-				JOptionPane.showMessageDialog(frame,
-						"Please create a message!", "Error",
-						JOptionPane.WARNING_MESSAGE);
-			}
-		}
-	}
-
-	private static class FrameWindowAdapter extends WindowAdapter
-	{
-		private QFixMessengerFrame frame;
-
-		public FrameWindowAdapter(QFixMessengerFrame frame)
-		{
-			this.frame = frame;
-		}
-
-		@Override
-		public void windowClosing(WindowEvent e)
-		{
-			frame.close();
-		}
-	}
-
-	private static class MarshallMessageTypeWorker extends
-			SwingWorker<Void, Void>
-	{
-		private final QFixMessengerFrame frame;
-		private final MessageType xmlMessageType;
-		private final File file;
-
-		MarshallMessageTypeWorker(QFixMessengerFrame frame,
-				MessageType xmlMessageType, File file)
-		{
-			this.frame = frame;
-			this.xmlMessageType = xmlMessageType;
-			this.file = file;
-		}
-
-		@Override
-		protected Void doInBackground() throws Exception
-		{
-			JAXBElement<MessageType> rootElement = new JAXBElement<MessageType>(
-					new QName("http://xml.fix.jramoyo.com", "message"),
-					MessageType.class, xmlMessageType);
-			Marshaller marshaller = frame.messenger.getJaxbContext()
-					.createMarshaller();
-			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT,
-					Boolean.TRUE);
-			marshaller.marshal(rootElement, file);
-			return null;
-		}
-
-		protected void done()
-		{
-			try
-			{
-				get();
-				logger.debug("Message exported to " + file.getName());
-				JOptionPane.showMessageDialog(frame, "Message exported to "
-						+ file.getName(), "Export",
-						JOptionPane.INFORMATION_MESSAGE);
-			} catch (Exception ex)
-			{
-				logger.error(
-						"A JAXBException occurred while exporting message.", ex);
-				JOptionPane.showMessageDialog(frame,
-						"An error occurred while exporting message!", "Error",
-						JOptionPane.ERROR_MESSAGE);
-			}
-		}
-	}
-
-	private static class MarshallProjectTypeWorker extends
-			SwingWorker<Void, Void>
-	{
-		private final QFixMessengerFrame frame;
-		private final ProjectType xmlProjectType;
-		private final File file;
-
-		MarshallProjectTypeWorker(QFixMessengerFrame frame,
-				ProjectType xmlProjectType, File file)
-		{
-			this.frame = frame;
-			this.xmlProjectType = xmlProjectType;
-			this.file = file;
-		}
-
-		@Override
-		protected Void doInBackground() throws Exception
-		{
-			JAXBElement<ProjectType> rootElement = new JAXBElement<ProjectType>(
-					new QName("http://xml.fix.jramoyo.com", "project"),
-					ProjectType.class, xmlProjectType);
-			Marshaller marshaller = frame.messenger.getJaxbContext()
-					.createMarshaller();
-			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT,
-					Boolean.TRUE);
-			marshaller.marshal(rootElement, file);
-			return null;
-		}
-
-		protected void done()
-		{
-			try
-			{
-				get();
-				logger.debug("Project saved to " + file.getName());
-				JOptionPane.showMessageDialog(frame,
-						"Project saved to " + file.getName(), "Export",
-						JOptionPane.INFORMATION_MESSAGE);
-			} catch (Exception ex)
-			{
-				logger.error(
-						"A JAXBException occurred while exporting message.", ex);
-				JOptionPane.showMessageDialog(frame,
-						"An error occurred while saving project!", "Error",
-						JOptionPane.ERROR_MESSAGE);
-			}
-		}
-	}
-
-	private class RecentMessagesListMouseAdapter extends MouseAdapter
-	{
-		private QFixMessengerFrame frame;
-
-		public RecentMessagesListMouseAdapter(QFixMessengerFrame frame)
-		{
-			this.frame = frame;
-		}
-
-		@Override
-		public void mouseClicked(MouseEvent e)
-		{
-			if (e.getClickCount() == 2)
-			{
-				int index = frame.recentMessagesList.locationToIndex(e
-						.getPoint());
-				if (index != -1)
-				{
-					Message message = (Message) frame.recentMessagesList
-							.getModel().getElementAt(index);
-
-					Message selectedMessage = (Message) frame.recentMessagesList
-							.getSelectedValue();
-					if (message == selectedMessage
-							&& message.getCategory() != null)
-					{
-						try
-						{
-							String url = frame.getMessenger().getConfig()
-									.getFixWikiUrl()
-									+ message.getName();
-							java.awt.Desktop.getDesktop().browse(
-									java.net.URI.create(url));
-						} catch (IOException ex)
-						{
-							JOptionPane.showMessageDialog(
-									frame,
-									"An exception occured:\n"
-											+ Arrays.toString(ex
-													.getStackTrace()), "Error",
-									JOptionPane.ERROR_MESSAGE);
-						}
-					}
-				}
-
-			}
-		}
-	}
-
-	private static class RecentMessagesListSelectionListener implements
-			ListSelectionListener
-	{
-		private QFixMessengerFrame frame;
-
-		public RecentMessagesListSelectionListener(QFixMessengerFrame frame)
-		{
-			this.frame = frame;
-		}
-
-		@Override
-		public void valueChanged(ListSelectionEvent e)
-		{
-			if (!e.getValueIsAdjusting())
-			{
-				frame.activeMessage = (Message) frame.recentMessagesList
-						.getSelectedValue();
-
-				if (logger.isDebugEnabled())
-				{
-					logger.debug("Selected message " + frame.activeMessage);
-				}
-
-				frame.requiredCheckBox.setSelected(true);
-				frame.modifyHeaderCheckBox.setSelected(false);
-				frame.modifyTrailerCheckBox.setSelected(false);
-
-				frame.updateButtons();
-				frame.displayMainPanel();
-			}
-		}
-	}
-
-	private class MessagesListMouseAdapter extends MouseAdapter
-	{
-		private QFixMessengerFrame frame;
-
-		public MessagesListMouseAdapter(QFixMessengerFrame frame)
-		{
-			this.frame = frame;
-		}
-
-		@Override
-		public void mouseClicked(MouseEvent e)
-		{
-			if (e.getClickCount() == 2)
-			{
-				int index = frame.messagesList.locationToIndex(e.getPoint());
-				Message message = (Message) frame.messagesList.getModel()
-						.getElementAt(index);
-
-				Message selectedMessage = (Message) frame.messagesList
-						.getSelectedValue();
-				if (message == selectedMessage && message.getCategory() != null)
-				{
-					try
-					{
-						String url = frame.getMessenger().getConfig()
-								.getFixWikiUrl()
-								+ message.getName();
-						java.awt.Desktop.getDesktop().browse(
-								java.net.URI.create(url));
-					} catch (IOException ex)
-					{
-						JOptionPane.showMessageDialog(
-								frame,
-								"An exception occured:\n"
-										+ Arrays.toString(ex.getStackTrace()),
-								"Error", JOptionPane.ERROR_MESSAGE);
-					}
-				}
-			}
-		}
-	}
-
-	private static class MessagesListSelectionListener implements
-			ListSelectionListener
-	{
-		private QFixMessengerFrame frame;
-
-		public MessagesListSelectionListener(QFixMessengerFrame frame)
-		{
-			this.frame = frame;
-		}
-
-		@Override
-		public void valueChanged(ListSelectionEvent e)
-		{
-			if (!e.getValueIsAdjusting())
-			{
-				frame.activeMessage = (Message) frame.messagesList
-						.getSelectedValue();
-
-				if (logger.isDebugEnabled())
-				{
-					logger.debug("Selected message " + frame.activeMessage);
-				}
-
-				frame.requiredCheckBox.setSelected(true);
-				frame.modifyHeaderCheckBox.setSelected(false);
-				frame.modifyTrailerCheckBox.setSelected(false);
-
-				frame.updateButtons();
-				frame.displayMainPanel();
-			}
-		}
-	}
-
-	private class MessagesTableMouseListener extends MouseAdapter
-	{
-		private QFixMessengerFrame frame;
-
-		public MessagesTableMouseListener(QFixMessengerFrame frame)
-		{
-			this.frame = frame;
-		}
-
-		@Override
-		public void mouseClicked(MouseEvent e)
-		{
-			if (e.getButton() == MouseEvent.BUTTON1)
-			{
-				if (e.getClickCount() == 2)
-				{
-					int viewRow = frame.messagesTable.rowAtPoint(e.getPoint());
-					int modelRow = frame.messagesTable
-							.convertRowIndexToModel(viewRow);
-
-					MessagesTableModel model = (MessagesTableModel) frame.messagesTable
-							.getModel();
-					MessagesTableModelData data = model.getData(modelRow);
-
-					JPanel panel = new JPanel();
-					panel.setLayout(new GridBagLayout());
-					GridBagConstraints c = new GridBagConstraints();
-					c.fill = GridBagConstraints.HORIZONTAL;
-					c.weightx = 0.5;
-					c.weighty = 0.0;
-					c.ipadx = 2;
-					c.ipady = 2;
-
-					JLabel timeLabel = new JLabel(
-							"<html><b>Time Stamp:</b> <i><font color = 'blue'>"
-									+ data.getDate() + "</font></i></html>");
-
-					c.gridx = 0;
-					c.gridy = 3;
-					panel.add(Box.createRigidArea(new Dimension(50, 10)), c);
-
-					JLabel directionLabel;
-					if (data.getDirection().equals(QFixMessageListener.RECV))
-					{
-						directionLabel = new JLabel(
-								"<html><b>Direction:</b> <i><b><font color = '#FF8040'>"
-										+ data.getDirection()
-										+ "</font></b></i></html>");
-					} else
-					{
-						directionLabel = new JLabel(
-								"<html><b>Direction:</b> <i><b><font color = '#669900'>"
-										+ data.getDirection()
-										+ "</font></b></i></html>");
-					}
-
-					JLabel sessionIdLabel = new JLabel(
-							"<html><b>Session ID:</b> <i><font color = 'blue'>"
-									+ data.getSessionName()
-									+ "</font></i></html>");
-
-					JLabel messageLabel = new JLabel(
-							"<html><b>Message:</b></html>");
-
-					c.gridx = 0;
-					c.gridy = 0;
-					panel.add(timeLabel, c);
-
-					c.gridx = 0;
-					c.gridy = 1;
-					panel.add(directionLabel, c);
-
-					c.gridx = 0;
-					c.gridy = 2;
-					panel.add(sessionIdLabel, c);
-
-					c.gridx = 0;
-					c.gridy = 2;
-					panel.add(sessionIdLabel, c);
-
-					c.gridx = 0;
-					c.gridy = 4;
-					panel.add(messageLabel, c);
-
-					JTextArea messageText = new JTextArea(data.getMessage(), 5,
-							40);
-					messageText.setLineWrap(true);
-					messageText.setEditable(false);
-
-					JScrollPane messageTextScrollPane = new JScrollPane(
-							messageText);
-					messageTextScrollPane.setBorder(new EtchedBorder());
-
-					c.gridx = 0;
-					c.gridy = 5;
-					panel.add(messageTextScrollPane, c);
-
-					JOptionPane.showMessageDialog(frame, panel,
-							"MsgType(35) = " + data.getMsgType(),
-							JOptionPane.PLAIN_MESSAGE);
-				}
-			} else if (e.getButton() == MouseEvent.BUTTON3)
-			{
-				JPopupMenu popupMenu = new JPopupMenu();
-
-				JMenuItem clearAllMenuItem = new JMenuItem("Clear All");
-				JMenuItem resendMenuItem = new JMenuItem("Resend");
-
-				clearAllMenuItem.setIcon(IconBuilder.build(getMessenger()
-						.getConfig(), IconBuilder.CLEAR_ALL_ICON));
-				clearAllMenuItem.addActionListener(new ActionListener()
-				{
-					@Override
-					public void actionPerformed(ActionEvent e)
-					{
-						MessagesTableModel model = (MessagesTableModel) frame.messagesTable
-								.getModel();
-						model.clear();
-					}
-				});
-
-				resendMenuItem.setIcon(IconBuilder.build(getMessenger()
-						.getConfig(), IconBuilder.SEND_SMALL_ICON));
-				resendMenuItem
-						.addActionListener(new ResendMessagesActionListener(
-								frame, e));
-
-				popupMenu.add(clearAllMenuItem);
-				popupMenu.add(resendMenuItem);
-				popupMenu.show(frame.messagesTable, e.getX(), e.getY());
-			}
-		}
-	}
-
-	private class ResendMessagesActionListener implements ActionListener
-	{
-
-		private QFixMessengerFrame frame;
-		private MouseEvent event;
-		private Session session;
-
-		public ResendMessagesActionListener(QFixMessengerFrame frame,
-				MouseEvent event)
-		{
-			this.frame = frame;
-			this.event = event;
-			this.session = frame.sessionsList.getSelectedValue();
-		}
-
-		@Override
-		public void actionPerformed(ActionEvent e)
-		{
-			int viewRow = frame.messagesTable.rowAtPoint(event.getPoint());
-			int modelRow = frame.messagesTable.convertRowIndexToModel(viewRow);
-
-			quickfix.Message message = new quickfix.Message();
-
-			MessagesTableModel model = (MessagesTableModel) frame.messagesTable
-					.getModel();
-			MessagesTableModelData data = model.getData(modelRow);
-
-			try
-			{
-				message.fromString(data.getMessage(),
-						session.getDataDictionary(), false);
-				session.send(message);
-			} catch (InvalidMessage e1)
-			{
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-		}
-
-	}
-
-	private static class ProjectWindowActionListener implements ActionListener
-	{
-		private QFixMessengerFrame frame;
-
-		public ProjectWindowActionListener(QFixMessengerFrame frame)
-		{
-			this.frame = frame;
-		}
-
-		@Override
-		public void actionPerformed(ActionEvent e)
-		{
-			if (frame.activeXmlProject != null)
-			{
-				frame.launchProjectDialog();
-			} else
-			{
-				JOptionPane.showMessageDialog(frame, "No active project!",
-						"Error", JOptionPane.WARNING_MESSAGE);
-			}
-		}
-	}
-
-	private static class LogfileWindowActionListener implements ActionListener
-	{
-		private QFixMessengerFrame frame;
-
-		public LogfileWindowActionListener(QFixMessengerFrame frame)
-		{
-			this.frame = frame;
-		}
-
-		@Override
-		public void actionPerformed(ActionEvent e)
-		{
-			if (!frame.sessionsList.isSelectionEmpty())
-			{
-				frame.launchLogfileDialog();
-			} else
-			{
-				JOptionPane.showMessageDialog(frame,
-						"Please select a session first!", "Error",
-						JOptionPane.WARNING_MESSAGE);
-			}
-
-		}
-
-	}
-
-	private static class SendActionListener implements ActionListener
-	{
-		private QFixMessengerFrame frame;
-
-		public SendActionListener(QFixMessengerFrame frame)
-		{
-			this.frame = frame;
-		}
-
-		@Override
-		public void actionPerformed(ActionEvent e)
-		{
-			Session session = (Session) frame.sessionsList.getSelectedValue();
-			if (session != null)
-			{
-				if (session.isLoggedOn())
-				{
-					if (frame.activeMessage != null)
-					{
-						quickfix.Message message = null;
-						if (!frame.activeMessage.equals(frame.freeTextMessage))
-						{
-							if (frame.messagePanel.hasValidFormat())
-							{
-								message = frame.messagePanel
-										.getQuickFixMember();
-							} else
-							{
-								int choice = JOptionPane
-										.showConfirmDialog(
-												frame,
-												"Some fields have format errors, send anyway?",
-												"Format Errors",
-												JOptionPane.YES_NO_OPTION,
-												JOptionPane.WARNING_MESSAGE);
-								if (choice == JOptionPane.YES_OPTION)
-								{
-									message = frame.messagePanel
-											.getQuickFixMember();
-								}
-							}
-						} else
-						{
-							message = frame.freeTextMessagePanel
-									.getQuickFixMember();
-						}
-
-						if (message != null)
-						{
-							if (frame.isPreviewBeforeSend)
-							{
-								JTextArea messageText = new JTextArea(
-										message.toString(), 5, 40);
-								messageText.setLineWrap(true);
-								messageText.setEditable(false);
-
-								JScrollPane messageTextScrollPane = new JScrollPane(
-										messageText);
-								messageTextScrollPane
-										.setBorder(new EtchedBorder());
-
-								int choice = JOptionPane.showConfirmDialog(
-										frame, messageTextScrollPane,
-										"Send Message?",
-										JOptionPane.YES_NO_OPTION,
-										JOptionPane.PLAIN_MESSAGE);
-								if (choice == JOptionPane.YES_OPTION)
-								{
-									logger.info("Sending message "
-											+ message.toString());
-									session.send(message);
-									updateRecentList(frame.activeMessage);
-								}
-							} else
-							{
-								logger.info("Sending message "
-										+ message.toString());
-								frame.getMessenger().sendQFixMessage(message,
-										session);
-								updateRecentList(frame.activeMessage);
-							}
-						}
-					} else
-					{
-						JOptionPane.showMessageDialog(frame,
-								"Please create a message!", "Error",
-								JOptionPane.WARNING_MESSAGE);
-					}
-				} else
-				{
-					JOptionPane.showMessageDialog(frame,
-							QFixUtil.getSessionName(session.getSessionID())
-									+ " is not logged on!", "Error",
-							JOptionPane.WARNING_MESSAGE);
-				}
-			} else
-			{
-				JOptionPane.showMessageDialog(frame,
-						"Please create a message!", "Error",
-						JOptionPane.WARNING_MESSAGE);
-			}
-		}
-
-		// Get Message from ActiveMessage rather than recent list or message
-		// list
-		public void updateRecentList(Message recentMsg)
-		{
-			if ("Free Text".equals(recentMsg.getName()))
-			{
-				return;
-			}
-
-			String key = frame.activeDictionary.getFullVersion();
-			Map<String, DefaultListModel<Message>> tmpMap = frame.recentMessagesMap;
-			DefaultListModel<Message> tmpListModel;
-
-			if (tmpMap.containsKey(key))
-			{
-				tmpListModel = tmpMap.get(key);
-				if (tmpListModel.contains(recentMsg))
-				{
-					tmpListModel.remove(tmpListModel.indexOf(recentMsg));
-					tmpListModel.add(0, recentMsg);
-				} else
-				{
-					tmpListModel.add(0, recentMsg);
-				}
-			} else
-			{
-				tmpListModel = new DefaultListModel<Message>();
-				tmpListModel.add(0, recentMsg);
-				tmpMap.put(key, tmpListModel);
-			}
-
-			frame.recentMessagesList.setModel(tmpMap.get(key));
-		}
-	}
-
-	private class SessionsListMouseAdapter extends MouseAdapter
-	{
-		private QFixMessengerFrame frame;
-
-		public SessionsListMouseAdapter(QFixMessengerFrame frame)
-		{
-			this.frame = frame;
-		}
-
-		@Override
-		public void mouseClicked(MouseEvent e)
-		{
-			if (e.getButton() == MouseEvent.BUTTON3)
-			{
-				int index = frame.sessionsList.locationToIndex(e.getPoint());
-				Session session = (Session) frame.sessionsList.getModel()
-						.getElementAt(index);
-
-				Session selectedSession = (Session) frame.sessionsList
-						.getSelectedValue();
-				if (session == selectedSession)
-				{
-					JPopupMenu sessionMenuPopup;
-					JCheckBoxMenuItem logonMenuItem;
-					JMenuItem resetMenuItem;
-					JMenuItem statusMenuItem;
-
-					sessionMenuPopup = new JPopupMenu();
-
-					logonMenuItem = new JCheckBoxMenuItem("Logon");
-					logonMenuItem.addItemListener(new LogonSessionItemListener(
-							session));
-					if (session.isLoggedOn())
-					{
-						logonMenuItem.setSelected(true);
-					} else
-					{
-						logonMenuItem.setSelected(false);
-					}
-					session.addStateListener(new LogonSessionMenuItemSessionStateListener(
-							logonMenuItem));
-
-					resetMenuItem = new JMenuItem("Reset");
-					resetMenuItem
-							.addActionListener(new ResetSessionActionListener(
-									frame, session));
-
-					statusMenuItem = new JMenuItem("Status");
-					statusMenuItem
-							.addActionListener(new SessionStatusActionListener(
-									frame, session));
-
-					sessionMenuPopup.add(logonMenuItem);
-					sessionMenuPopup.add(resetMenuItem);
-					sessionMenuPopup.add(statusMenuItem);
-
-					sessionMenuPopup.show(frame.sessionsList, e.getX(),
-							e.getY());
-				}
-			}
-		}
-	}
-
-	private static class SessionsListSelectionListener implements
-			ListSelectionListener
-	{
-		private QFixMessengerFrame frame;
-
-		public SessionsListSelectionListener(QFixMessengerFrame frame)
-		{
-			this.frame = frame;
-		}
-
-		@Override
-		public void valueChanged(ListSelectionEvent e)
-		{
-			if (!e.getValueIsAdjusting())
-			{
-				Session session = (Session) frame.sessionsList
-						.getSelectedValue();
-				SessionID sessionId = session.getSessionID();
-
-				if (sessionId.getBeginString().equals(
-						QFixMessengerConstants.BEGIN_STRING_FIXT11))
-				{
-					frame.appVersionsComboBox.setEnabled(true);
-					frame.activeDictionary = null;
-					frame.isFixTSession = true;
-				} else
-				{
-					frame.appVersionsComboBox.setEnabled(false);
-					frame.isFixTSession = false;
-
-					try
-					{
-						FixDictionaryParser parser = frame.messenger
-								.getParser();
-						String fixDictionaryLocation = frame.messenger
-								.getConfig().getFixDictionaryLocation(
-										sessionId.getBeginString());
-						frame.activeDictionary = parser.parse(getClass()
-								.getResourceAsStream(fixDictionaryLocation));
-					} catch (FixParsingException ex)
-					{
-						JOptionPane.showMessageDialog(frame,
-								"An error occured while"
-										+ " parsing the FIX dictionary: " + ex,
-								"Error", JOptionPane.ERROR_MESSAGE);
-					}
-				}
-
-				if (logger.isDebugEnabled())
-				{
-					logger.debug("Selected dictionary "
-							+ frame.activeDictionary);
-				}
-
-				frame.activeMessage = null;
-				frame.updateButtons();
-				frame.displayMainPanel();
-				frame.loadMessagesList();
-				frame.updateLogFile(sessionId.getBeginString());
-			}
-		}
-	}
+    private void updateLogFile(String beginStr)
+    {
+        if (logfileDialog != null && logfileDialog.isVisible()) {
+            logfileDialog.loadLogfile(beginStr);
+        }
+    }
+
+    public static class XmlFileFilter extends FileFilter
+    {
+
+        public static final XmlFileFilter INSTANCE = new XmlFileFilter();
+
+        @Override public boolean accept(File f)
+        {
+            if (f.isDirectory()) {
+                return true;
+            }
+            return f.getName().endsWith(".xml");
+        }
+
+        @Override public String getDescription()
+        {
+            return "XML Files (*.xml)";
+        }
+    }
+
+    private static class AddMessageActionListener implements ActionListener
+    {
+
+        private QFixMessengerFrame frame;
+
+        public AddMessageActionListener(QFixMessengerFrame frame)
+        {
+            this.frame = frame;
+        }
+
+        @Override public void actionPerformed(ActionEvent e)
+        {
+            if (!frame.activeMessage.equals(frame.freeTextMessage)) {
+                MessageType xmlMessageType = frame.messagePanel.getXmlMember();
+                ProjectType xmlProjectType = frame.getActiveXmlProject();
+                xmlProjectType.getMessages().getMessage().add(xmlMessageType);
+                frame.projectDialog.updateMessageAdded(xmlMessageType);
+            }
+            else {
+                JOptionPane.showMessageDialog(frame, "Projects do not support free text messages!", "Error", JOptionPane.WARNING_MESSAGE);
+            }
+        }
+    }
+
+    private static class AppVersionsComboBoxActionListener implements ActionListener
+    {
+
+        private QFixMessengerFrame frame;
+
+        public AppVersionsComboBoxActionListener(QFixMessengerFrame frame)
+        {
+            this.frame = frame;
+        }
+
+        @Override public void actionPerformed(ActionEvent e)
+        {
+            String appVersion = (String) frame.appVersionsComboBox.getSelectedItem();
+            try {
+                String fixDictionaryLocation = frame.messenger.getConfig().getFixDictionaryLocation(appVersion);
+                frame.activeDictionary = frame.messenger.getParser().parse(getClass().getResourceAsStream(fixDictionaryLocation));
+            } catch (FixParsingException ex) {
+                JOptionPane.showMessageDialog(frame, "An error occured while" + " parsing the FIX dictionary: " + ex, "Error", JOptionPane.ERROR_MESSAGE);
+            }
+
+            if (logger.isDebugEnabled()) {
+                logger.debug("Selected dictionary " + frame.activeDictionary);
+            }
+            frame.loadMessagesList();
+        }
+    }
+
+    private static class DestroyMessageActionListener implements ActionListener
+    {
+
+        private QFixMessengerFrame frame;
+
+        private DestroyMessageActionListener(QFixMessengerFrame frame)
+        {
+            this.frame = frame;
+        }
+
+        @Override public void actionPerformed(ActionEvent e)
+        {
+            int choice = JOptionPane.showConfirmDialog(frame, "Clear all saved fields?", "Destroy Message?", JOptionPane.YES_NO_OPTION);
+            if (choice == JOptionPane.YES_OPTION) {
+                frame.messagePanel = null;
+                frame.getMemberPanelCache().clear();
+                frame.displayMainPanel();
+            }
+        }
+    }
+
+    private static class ExportMessageActionListener implements ActionListener
+    {
+
+        private QFixMessengerFrame frame;
+
+        public ExportMessageActionListener(QFixMessengerFrame frame)
+        {
+            this.frame = frame;
+        }
+
+        @Override public void actionPerformed(ActionEvent e)
+        {
+            if (frame.activeMessage != null) {
+                if (!frame.activeMessage.equals(frame.freeTextMessage)) {
+                    MessageType xmlMessageType = frame.messagePanel.getXmlMember();
+                    frame.marshallXmlMessage(xmlMessageType);
+                }
+                else {
+                    JOptionPane.showMessageDialog(frame, "Free text message cannot be exported!", "Error", JOptionPane.WARNING_MESSAGE);
+                }
+            }
+            else {
+                JOptionPane.showMessageDialog(frame, "Please create a message!", "Error", JOptionPane.WARNING_MESSAGE);
+            }
+        }
+    }
+
+    private static class FrameWindowAdapter extends WindowAdapter
+    {
+
+        private QFixMessengerFrame frame;
+
+        public FrameWindowAdapter(QFixMessengerFrame frame)
+        {
+            this.frame = frame;
+        }
+
+        @Override public void windowClosing(WindowEvent e)
+        {
+            frame.close();
+        }
+    }
+
+    private static class MarshallMessageTypeWorker extends SwingWorker<Void, Void>
+    {
+
+        private final QFixMessengerFrame frame;
+        private final MessageType xmlMessageType;
+        private final File file;
+
+        MarshallMessageTypeWorker(QFixMessengerFrame frame, MessageType xmlMessageType, File file)
+        {
+            this.frame = frame;
+            this.xmlMessageType = xmlMessageType;
+            this.file = file;
+        }
+
+        @Override protected Void doInBackground() throws Exception
+        {
+            JAXBElement<MessageType> rootElement = new JAXBElement<MessageType>(new QName("http://xml.fix.jramoyo.com", "message"), MessageType.class, xmlMessageType);
+            Marshaller marshaller = frame.messenger.getJaxbContext().createMarshaller();
+            marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+            marshaller.marshal(rootElement, file);
+            return null;
+        }
+
+        protected void done()
+        {
+            try {
+                get();
+                logger.debug("Message exported to " + file.getName());
+                JOptionPane.showMessageDialog(frame, "Message exported to " + file.getName(), "Export", JOptionPane.INFORMATION_MESSAGE);
+            } catch (Exception ex) {
+                logger.error("A JAXBException occurred while exporting message.", ex);
+                JOptionPane.showMessageDialog(frame, "An error occurred while exporting message!", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
+
+    private static class MarshallProjectTypeWorker extends SwingWorker<Void, Void>
+    {
+
+        private final QFixMessengerFrame frame;
+        private final ProjectType xmlProjectType;
+        private final File file;
+
+        MarshallProjectTypeWorker(QFixMessengerFrame frame, ProjectType xmlProjectType, File file)
+        {
+            this.frame = frame;
+            this.xmlProjectType = xmlProjectType;
+            this.file = file;
+        }
+
+        @Override protected Void doInBackground() throws Exception
+        {
+            JAXBElement<ProjectType> rootElement = new JAXBElement<ProjectType>(new QName("http://xml.fix.jramoyo.com", "project"), ProjectType.class, xmlProjectType);
+            Marshaller marshaller = frame.messenger.getJaxbContext().createMarshaller();
+            marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+            marshaller.marshal(rootElement, file);
+            return null;
+        }
+
+        protected void done()
+        {
+            try {
+                get();
+                logger.debug("Project saved to " + file.getName());
+                JOptionPane.showMessageDialog(frame, "Project saved to " + file.getName(), "Export", JOptionPane.INFORMATION_MESSAGE);
+            } catch (Exception ex) {
+                logger.error("A JAXBException occurred while exporting message.", ex);
+                JOptionPane.showMessageDialog(frame, "An error occurred while saving project!", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
+
+    private class RecentMessagesListMouseAdapter extends MouseAdapter
+    {
+
+        private QFixMessengerFrame frame;
+
+        public RecentMessagesListMouseAdapter(QFixMessengerFrame frame)
+        {
+            this.frame = frame;
+        }
+
+        @Override public void mouseClicked(MouseEvent e)
+        {
+            if (e.getClickCount() == 2) {
+                int index = frame.recentMessagesList.locationToIndex(e.getPoint());
+                if (index != -1) {
+                    Message message = (Message) frame.recentMessagesList.getModel().getElementAt(index);
+
+                    Message selectedMessage = (Message) frame.recentMessagesList.getSelectedValue();
+                    if (message == selectedMessage && message.getCategory() != null) {
+                        try {
+                            String url = frame.getMessenger().getConfig().getFixWikiUrl() + message.getName();
+                            java.awt.Desktop.getDesktop().browse(java.net.URI.create(url));
+                        } catch (IOException ex) {
+                            JOptionPane.showMessageDialog(frame, "An exception occured:\n" + Arrays.toString(ex.getStackTrace()), "Error", JOptionPane.ERROR_MESSAGE);
+                        }
+                    }
+                }
+
+            }
+        }
+    }
+
+    private static class RecentMessagesListSelectionListener implements ListSelectionListener
+    {
+
+        private QFixMessengerFrame frame;
+
+        public RecentMessagesListSelectionListener(QFixMessengerFrame frame)
+        {
+            this.frame = frame;
+        }
+
+        @Override public void valueChanged(ListSelectionEvent e)
+        {
+            if (!e.getValueIsAdjusting()) {
+                frame.activeMessage = (Message) frame.recentMessagesList.getSelectedValue();
+
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Selected message " + frame.activeMessage);
+                }
+
+                frame.requiredCheckBox.setSelected(true);
+                frame.modifyHeaderCheckBox.setSelected(false);
+                frame.modifyTrailerCheckBox.setSelected(false);
+
+                frame.updateButtons();
+                frame.displayMainPanel();
+            }
+        }
+    }
+
+    private class MessagesListMouseAdapter extends MouseAdapter
+    {
+
+        private QFixMessengerFrame frame;
+
+        public MessagesListMouseAdapter(QFixMessengerFrame frame)
+        {
+            this.frame = frame;
+        }
+
+        @Override public void mouseClicked(MouseEvent e)
+        {
+            if (e.getClickCount() == 2) {
+                int index = frame.messagesList.locationToIndex(e.getPoint());
+                Message message = (Message) frame.messagesList.getModel().getElementAt(index);
+
+                Message selectedMessage = (Message) frame.messagesList.getSelectedValue();
+                if (message == selectedMessage && message.getCategory() != null) {
+                    try {
+                        String url = frame.getMessenger().getConfig().getFixWikiUrl() + message.getName();
+                        java.awt.Desktop.getDesktop().browse(java.net.URI.create(url));
+                    } catch (IOException ex) {
+                        JOptionPane.showMessageDialog(frame, "An exception occured:\n" + Arrays.toString(ex.getStackTrace()), "Error", JOptionPane.ERROR_MESSAGE);
+                    }
+                }
+            }
+        }
+    }
+
+    private static class MessagesListSelectionListener implements ListSelectionListener
+    {
+
+        private QFixMessengerFrame frame;
+
+        public MessagesListSelectionListener(QFixMessengerFrame frame)
+        {
+            this.frame = frame;
+        }
+
+        @Override public void valueChanged(ListSelectionEvent e)
+        {
+            if (!e.getValueIsAdjusting()) {
+                frame.activeMessage = (Message) frame.messagesList.getSelectedValue();
+
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Selected message " + frame.activeMessage);
+                }
+
+                frame.requiredCheckBox.setSelected(true);
+                frame.modifyHeaderCheckBox.setSelected(false);
+                frame.modifyTrailerCheckBox.setSelected(false);
+
+                frame.updateButtons();
+                frame.displayMainPanel();
+            }
+        }
+    }
+
+    private class MessagesTableMouseListener extends MouseAdapter
+    {
+
+        private QFixMessengerFrame frame;
+
+        public MessagesTableMouseListener(QFixMessengerFrame frame)
+        {
+            this.frame = frame;
+        }
+
+        @Override public void mouseClicked(MouseEvent e)
+        {
+            if (e.getButton() == MouseEvent.BUTTON1) {
+                if (e.getClickCount() == 2) {
+                    int viewRow = frame.messagesTable.rowAtPoint(e.getPoint());
+                    int modelRow = frame.messagesTable.convertRowIndexToModel(viewRow);
+
+                    MessagesTableModel model = (MessagesTableModel) frame.messagesTable.getModel();
+                    MessagesTableModelData data = model.getData(modelRow);
+
+                    JPanel panel = new JPanel();
+                    panel.setLayout(new GridBagLayout());
+                    GridBagConstraints c = new GridBagConstraints();
+                    c.fill = GridBagConstraints.HORIZONTAL;
+                    c.weightx = 0.5;
+                    c.weighty = 0.0;
+                    c.ipadx = 2;
+                    c.ipady = 2;
+
+                    JLabel timeLabel = new JLabel("<html><b>Time Stamp:</b> <i><font color = 'blue'>" + data.getDate() + "</font></i></html>");
+
+                    c.gridx = 0;
+                    c.gridy = 3;
+                    panel.add(Box.createRigidArea(new Dimension(50, 10)), c);
+
+                    JLabel directionLabel;
+                    if (data.getDirection().equals(QFixMessageListener.RECV)) {
+                        directionLabel = new JLabel("<html><b>Direction:</b> <i><b><font color = '#FF8040'>" + data.getDirection() + "</font></b></i></html>");
+                    }
+                    else {
+                        directionLabel = new JLabel("<html><b>Direction:</b> <i><b><font color = '#669900'>" + data.getDirection() + "</font></b></i></html>");
+                    }
+
+                    JLabel sessionIdLabel = new JLabel("<html><b>Session ID:</b> <i><font color = 'blue'>" + data.getSessionName() + "</font></i></html>");
+
+                    JLabel messageLabel = new JLabel("<html><b>Message:</b></html>");
+
+                    c.gridx = 0;
+                    c.gridy = 0;
+                    panel.add(timeLabel, c);
+
+                    c.gridx = 0;
+                    c.gridy = 1;
+                    panel.add(directionLabel, c);
+
+                    c.gridx = 0;
+                    c.gridy = 2;
+                    panel.add(sessionIdLabel, c);
+
+                    c.gridx = 0;
+                    c.gridy = 2;
+                    panel.add(sessionIdLabel, c);
+
+                    c.gridx = 0;
+                    c.gridy = 4;
+                    panel.add(messageLabel, c);
+
+                    JTextArea messageText = new JTextArea(data.getMessage(), 5, 40);
+                    messageText.setLineWrap(true);
+                    messageText.setEditable(false);
+
+                    JScrollPane messageTextScrollPane = new JScrollPane(messageText);
+                    messageTextScrollPane.setBorder(new EtchedBorder());
+
+                    c.gridx = 0;
+                    c.gridy = 5;
+                    panel.add(messageTextScrollPane, c);
+
+                    JOptionPane.showMessageDialog(frame, panel, "MsgType(35) = " + data.getMsgType(), JOptionPane.PLAIN_MESSAGE);
+                }
+            }
+            else if (e.getButton() == MouseEvent.BUTTON3) {
+                JPopupMenu popupMenu = new JPopupMenu();
+
+                JMenuItem clearAllMenuItem = new JMenuItem("Clear All");
+                JMenuItem resendMenuItem = new JMenuItem("Resend");
+
+                clearAllMenuItem.setIcon(IconBuilder.build(getMessenger().getConfig(), IconBuilder.CLEAR_ALL_ICON));
+                clearAllMenuItem.addActionListener(new ActionListener()
+                {
+                    @Override public void actionPerformed(ActionEvent e)
+                    {
+                        MessagesTableModel model = (MessagesTableModel) frame.messagesTable.getModel();
+                        model.clear();
+                    }
+                });
+
+                resendMenuItem.setIcon(IconBuilder.build(getMessenger().getConfig(), IconBuilder.SEND_SMALL_ICON));
+                resendMenuItem.addActionListener(new ResendMessagesActionListener(frame, e));
+
+                popupMenu.add(clearAllMenuItem);
+                popupMenu.add(resendMenuItem);
+                popupMenu.show(frame.messagesTable, e.getX(), e.getY());
+            }
+        }
+    }
+
+    private class ResendMessagesActionListener implements ActionListener
+    {
+
+        private QFixMessengerFrame frame;
+        private MouseEvent event;
+        private Session session;
+
+        public ResendMessagesActionListener(QFixMessengerFrame frame, MouseEvent event)
+        {
+            this.frame = frame;
+            this.event = event;
+            this.session = frame.sessionsList.getSelectedValue();
+        }
+
+        @Override public void actionPerformed(ActionEvent e)
+        {
+            int viewRow = frame.messagesTable.rowAtPoint(event.getPoint());
+            int modelRow = frame.messagesTable.convertRowIndexToModel(viewRow);
+
+            quickfix.Message message = new quickfix.Message();
+
+            MessagesTableModel model = (MessagesTableModel) frame.messagesTable.getModel();
+            MessagesTableModelData data = model.getData(modelRow);
+
+            try {
+                message.fromString(MessageFormatter.formatStringToFix(data.getMessage()), session.getDataDictionary(), false);
+                session.send(message);
+            } catch (InvalidMessage e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+            }
+        }
+
+    }
+
+    private static class ProjectWindowActionListener implements ActionListener
+    {
+
+        private QFixMessengerFrame frame;
+
+        public ProjectWindowActionListener(QFixMessengerFrame frame)
+        {
+            this.frame = frame;
+        }
+
+        @Override public void actionPerformed(ActionEvent e)
+        {
+            if (frame.activeXmlProject != null) {
+                frame.launchProjectDialog();
+            }
+            else {
+                JOptionPane.showMessageDialog(frame, "No active project!", "Error", JOptionPane.WARNING_MESSAGE);
+            }
+        }
+    }
+
+    private static class LogfileWindowActionListener implements ActionListener
+    {
+
+        private QFixMessengerFrame frame;
+
+        public LogfileWindowActionListener(QFixMessengerFrame frame)
+        {
+            this.frame = frame;
+        }
+
+        @Override public void actionPerformed(ActionEvent e)
+        {
+            if (!frame.sessionsList.isSelectionEmpty()) {
+                frame.launchLogfileDialog();
+            }
+            else {
+                JOptionPane.showMessageDialog(frame, "Please select a session first!", "Error", JOptionPane.WARNING_MESSAGE);
+            }
+
+        }
+
+    }
+
+    private static class SendActionListener implements ActionListener
+    {
+
+        private QFixMessengerFrame frame;
+
+        public SendActionListener(QFixMessengerFrame frame)
+        {
+            this.frame = frame;
+        }
+
+        @Override public void actionPerformed(ActionEvent e)
+        {
+            Session session = (Session) frame.sessionsList.getSelectedValue();
+            if (session != null) {
+                if (session.isLoggedOn()) {
+                    if (frame.activeMessage != null) {
+                        quickfix.Message message = null;
+                        if (!frame.activeMessage.equals(frame.freeTextMessage)) {
+                            if (frame.messagePanel.hasValidFormat()) {
+                                message = frame.messagePanel.getQuickFixMember();
+                            }
+                            else {
+                                int choice = JOptionPane.showConfirmDialog(frame, "Some fields have format errors, send anyway?", "Format Errors", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+                                if (choice == JOptionPane.YES_OPTION) {
+                                    message = frame.messagePanel.getQuickFixMember();
+                                }
+                            }
+                        }
+                        else {
+                            message = frame.freeTextMessagePanel.getQuickFixMember();
+                        }
+
+                        if (message != null) {
+                            if (frame.isPreviewBeforeSend) {
+                                JTextArea messageText = new JTextArea(MessageFormatter.formatFixToString(message), 5, 40);
+                                messageText.setLineWrap(true);
+                                messageText.setEditable(false);
+
+                                JScrollPane messageTextScrollPane = new JScrollPane(messageText);
+                                messageTextScrollPane.setBorder(new EtchedBorder());
+
+                                int choice = JOptionPane.showConfirmDialog(frame, messageTextScrollPane, "Send Message?", JOptionPane.YES_NO_OPTION, JOptionPane.PLAIN_MESSAGE);
+                                if (choice == JOptionPane.YES_OPTION) {
+                                    logger.info("Sending message " + MessageFormatter.formatFixToString(message));
+                                    session.send(message);
+                                    updateRecentList(frame.activeMessage);
+                                }
+                            }
+                            else {
+                                logger.info("Sending message " + MessageFormatter.formatFixToString(message));
+                                frame.getMessenger().sendQFixMessage(message, session);
+                                updateRecentList(frame.activeMessage);
+                            }
+                        }
+                    }
+                    else {
+                        JOptionPane.showMessageDialog(frame, "Please create a message!", "Error", JOptionPane.WARNING_MESSAGE);
+                    }
+                }
+                else {
+                    JOptionPane.showMessageDialog(frame, QFixUtil.getSessionName(session.getSessionID()) + " is not logged on!", "Error", JOptionPane.WARNING_MESSAGE);
+                }
+            }
+            else {
+                JOptionPane.showMessageDialog(frame, "Please create a message!", "Error", JOptionPane.WARNING_MESSAGE);
+            }
+        }
+
+        // Get Message from ActiveMessage rather than recent list or message
+        // list
+        public void updateRecentList(Message recentMsg)
+        {
+            if ("Free Text".equals(recentMsg.getName())) {
+                return;
+            }
+
+            String key = frame.activeDictionary.getFullVersion();
+            Map<String, DefaultListModel<Message>> tmpMap = frame.recentMessagesMap;
+            DefaultListModel<Message> tmpListModel;
+
+            if (tmpMap.containsKey(key)) {
+                tmpListModel = tmpMap.get(key);
+                if (tmpListModel.contains(recentMsg)) {
+                    tmpListModel.remove(tmpListModel.indexOf(recentMsg));
+                    tmpListModel.add(0, recentMsg);
+                }
+                else {
+                    tmpListModel.add(0, recentMsg);
+                }
+            }
+            else {
+                tmpListModel = new DefaultListModel<Message>();
+                tmpListModel.add(0, recentMsg);
+                tmpMap.put(key, tmpListModel);
+            }
+
+            frame.recentMessagesList.setModel(tmpMap.get(key));
+        }
+    }
+
+    private class SessionsListMouseAdapter extends MouseAdapter
+    {
+
+        private QFixMessengerFrame frame;
+
+        public SessionsListMouseAdapter(QFixMessengerFrame frame)
+        {
+            this.frame = frame;
+        }
+
+        @Override public void mouseClicked(MouseEvent e)
+        {
+            if (e.getButton() == MouseEvent.BUTTON3) {
+                int index = frame.sessionsList.locationToIndex(e.getPoint());
+                Session session = (Session) frame.sessionsList.getModel().getElementAt(index);
+
+                Session selectedSession = (Session) frame.sessionsList.getSelectedValue();
+                if (session == selectedSession) {
+                    JPopupMenu sessionMenuPopup;
+                    JCheckBoxMenuItem logonMenuItem;
+                    JMenuItem resetMenuItem;
+                    JMenuItem statusMenuItem;
+                    JMenuItem seqnumMenuItem;
+                    
+                    sessionMenuPopup = new JPopupMenu();
+
+                    logonMenuItem = new JCheckBoxMenuItem("Logon");
+                    logonMenuItem.addItemListener(new LogonSessionItemListener(session));
+                    session.addStateListener(new LogonSessionMenuItemSessionStateListener(logonMenuItem));
+
+                    resetMenuItem = new JMenuItem("Reset");
+                    resetMenuItem.addActionListener(new ResetSessionActionListener(frame, session));
+
+                    statusMenuItem = new JMenuItem("Status");
+                    statusMenuItem.addActionListener(new SessionStatusActionListener(frame, session));
+
+                    seqnumMenuItem = new JMenuItem("Set Sequence Numbers");
+                    seqnumMenuItem.addActionListener(new SessionSetSeqNumActionListener(frame, session));
+
+                    session.addStateListener(new SessionMenuItemSessionStateListener(seqnumMenuItem, resetMenuItem));
+
+                    if (session.isLoggedOn()) {
+                        logonMenuItem.setSelected(true);
+                        seqnumMenuItem.setEnabled(false);
+                        resetMenuItem.setEnabled(false);
+                    }
+                    else {
+                        logonMenuItem.setSelected(false);
+                        seqnumMenuItem.setEnabled(true);
+                        resetMenuItem.setEnabled(true);
+                    }
+
+                    sessionMenuPopup.add(logonMenuItem);
+                    sessionMenuPopup.add(resetMenuItem);
+                    sessionMenuPopup.add(statusMenuItem);
+                    sessionMenuPopup.add(seqnumMenuItem);
+
+                    sessionMenuPopup.show(frame.sessionsList, e.getX(), e.getY());
+                }
+            }
+        }
+    }
+
+    private static class SessionsListSelectionListener implements ListSelectionListener
+    {
+
+        private QFixMessengerFrame frame;
+
+        public SessionsListSelectionListener(QFixMessengerFrame frame)
+        {
+            this.frame = frame;
+        }
+
+        @Override public void valueChanged(ListSelectionEvent e)
+        {
+            if (!e.getValueIsAdjusting()) {
+                Session session = (Session) frame.sessionsList.getSelectedValue();
+                SessionID sessionId = session.getSessionID();
+
+                if (sessionId.getBeginString().equals(QFixMessengerConstants.BEGIN_STRING_FIXT11)) {
+                    frame.appVersionsComboBox.setEnabled(true);
+                    frame.activeDictionary = null;
+                    frame.isFixTSession = true;
+                }
+                else {
+                    frame.appVersionsComboBox.setEnabled(false);
+                    frame.isFixTSession = false;
+
+                    try {
+                        FixDictionaryParser parser = frame.messenger.getParser();
+                        String fixDictionaryLocation = frame.messenger.getConfig().getFixDictionaryLocation(sessionId.getBeginString());
+                        logger.info("fixDictionaryLocation=" + fixDictionaryLocation);
+                        frame.activeDictionary = parser.parse(getClass().getResourceAsStream(fixDictionaryLocation));
+                    } catch (FixParsingException ex) {
+                        JOptionPane.showMessageDialog(frame, "An error occured while" + " parsing the FIX dictionary: " + ex, "Error", JOptionPane.ERROR_MESSAGE);
+                    }
+                }
+
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Selected dictionary " + frame.activeDictionary);
+                }
+
+                frame.activeMessage = null;
+                frame.updateButtons();
+                frame.displayMainPanel();
+                frame.loadMessagesList();
+                frame.updateLogFile(sessionId.getBeginString());
+            }
+        }
+    }
 
 }

@@ -37,10 +37,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.Thread.UncaughtExceptionHandler;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -51,6 +48,7 @@ import javax.swing.UIManager;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 
+import com.jramoyo.fix.model.decode.MessageFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -95,12 +93,14 @@ import com.jramoyo.qfixmessenger.ui.QFixMessengerFrame;
  */
 public class QFixMessenger
 {
-	private static final Logger logger = LoggerFactory
-			.getLogger(QFixMessenger.class);
+	private static final Logger logger = LoggerFactory.getLogger(QFixMessenger.class);
 	private static final CountDownLatch shutdownLatch = new CountDownLatch(1);
 
 	public static void main(String[] args) throws Exception
 	{
+        System.out.println("args="+Arrays.toString(args));
+        logger.info("args={}", Arrays.toString(args));
+
 		Thread.setDefaultUncaughtExceptionHandler(new UncaughtExceptionHandler()
 		{
 			@Override
@@ -117,6 +117,7 @@ public class QFixMessenger
 				setLookAndFeel();
 			}
 		});
+
 
 		if (args.length == 2)
 		{
@@ -139,10 +140,9 @@ public class QFixMessenger
 				try
 				{
 					SessionSettings settings = new SessionSettings(inputStream);
-					inputStream.close();
+                    inputStream.close();
 
-					QFixMessenger messenger = new QFixMessenger(configFileName,
-							settings);
+					QFixMessenger messenger = new QFixMessenger(configFileName, settings);
 					messenger.logon();
 					QFixMessengerFrame.launch(messenger);
 
@@ -163,8 +163,7 @@ public class QFixMessenger
 			}
 		} else
 		{
-			System.out.println("Usage: QFixMessenger <app cfg file>"
-					+ " <quickfix cfg file>");
+			System.out.println("Usage: QFixMessenger <app cfg file>" + " <quickfix cfg file>");
 			System.exit(0);
 		}
 	}
@@ -173,16 +172,13 @@ public class QFixMessenger
 	{
 		try
 		{
-			String useSystemLookAndFeelProperty = System
-					.getProperty("useSystemLaF");
+			String useSystemLookAndFeelProperty = System.getProperty("useSystemLaF");
 			if (Boolean.valueOf(useSystemLookAndFeelProperty))
 			{
-				UIManager.setLookAndFeel(UIManager
-						.getSystemLookAndFeelClassName());
+				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 			} else
 			{
-				UIManager
-						.setLookAndFeel("org.pushingpixels.substance.api.skin.SubstanceDustLookAndFeel");
+				UIManager.setLookAndFeel("org.pushingpixels.substance.api.skin.SubstanceDustLookAndFeel");
 				JFrame.setDefaultLookAndFeelDecorated(true);
 				JDialog.setDefaultLookAndFeelDecorated(true);
 			}
@@ -204,8 +200,7 @@ public class QFixMessenger
 
 	private JAXBContext jaxbContext;
 
-	private QFixMessenger(String configFileName, SessionSettings settings)
-			throws ConfigError, IOException
+	private QFixMessenger(String configFileName, SessionSettings settings) throws ConfigError, IOException
 	{
 		// Load application configuration
 		config = new QFixMessengerConfig(configFileName);
@@ -223,12 +218,11 @@ public class QFixMessenger
 
 		if (config.isInitiator())
 		{
-			connector = new SocketInitiator(application, messageStoreFactory,
-					settings, logFactory, messageFactory);
-		} else
+			connector = new SocketInitiator(application, messageStoreFactory, settings, logFactory, messageFactory);
+		}
+        else
 		{
-			connector = new SocketAcceptor(application, messageStoreFactory,
-					settings, logFactory, messageFactory);
+			connector = new SocketAcceptor(application, messageStoreFactory, settings, logFactory, messageFactory);
 		}
 
 		connectorStarted = new AtomicBoolean(false);
@@ -236,7 +230,8 @@ public class QFixMessenger
 		try
 		{
 			jaxbContext = JAXBContext.newInstance("com.jramoyo.fix.xml");
-		} catch (JAXBException ex)
+		}
+        catch (JAXBException ex)
 		{
 			logger.error("Unable to create JAXB context for com.jramoyo.fix.xml");
 			System.exit(1);
@@ -353,7 +348,7 @@ public class QFixMessenger
 	 */
 	public boolean sendQFixMessage(Message message, Session session)
 	{
-		logger.info("Sending message: " + message.toString());
+		logger.info("Sending message: " + MessageFormatter.formatFixToString(message));
 		return session.send(message);
 	}
 
@@ -366,15 +361,13 @@ public class QFixMessenger
 	 * @return whether the message was sent or not
 	 * @throws QFixMessengerException
 	 */
-	public boolean sendXmlMessage(MessageType xmlMessageType)
-			throws QFixMessengerException
+	public boolean sendXmlMessage(MessageType xmlMessageType) throws QFixMessengerException
 	{
 		Session session = null;
 		List<SessionID> sessionIds = connector.getSessions();
 		for (SessionID sessionId : sessionIds)
 		{
-			if (QFixUtil.getSessionName(sessionId).equals(
-					xmlMessageType.getSession().getName()))
+			if (QFixUtil.getSessionName(sessionId).equals(xmlMessageType.getSession().getName()))
 			{
 				session = Session.lookupSession(sessionId);
 			}
@@ -384,16 +377,11 @@ public class QFixMessenger
 		{
 			if (session.isLoggedOn())
 			{
-				quickfix.Message message = session.getMessageFactory().create(
-						session.getSessionID().getBeginString(),
-						xmlMessageType.getMsgType());
+				quickfix.Message message = session.getMessageFactory().create(session.getSessionID().getBeginString(), xmlMessageType.getMsgType());
 
 				if (xmlMessageType.getSession().getAppVersionId() != null)
 				{
-					ApplVerID applVerID = new ApplVerID(
-							QFixMessengerConstants.APPVER_ID_MAP
-									.get(xmlMessageType.getSession()
-											.getAppVersionId()));
+					ApplVerID applVerID = new ApplVerID(QFixMessengerConstants.APPVER_ID_MAP.get(xmlMessageType.getSession().getAppVersionId()));
 					message.getHeader().setField(applVerID);
 				}
 
@@ -402,14 +390,12 @@ public class QFixMessenger
 					HeaderType xmlHeaderType = xmlMessageType.getHeader();
 					for (FieldType xmlFieldType : xmlHeaderType.getField())
 					{
-						message.getHeader().setField(
-								createStringField(xmlFieldType));
+						message.getHeader().setField(createStringField(xmlFieldType));
 					}
 				}
 
 				BodyType xmlBodyType = xmlMessageType.getBody();
-				for (Object xmlObject : xmlBodyType
-						.getFieldOrGroupsOrComponent())
+				for (Object xmlObject : xmlBodyType.getFieldOrGroupsOrComponent())
 				{
 					if (xmlObject instanceof FieldType)
 					{
@@ -430,8 +416,7 @@ public class QFixMessenger
 					{
 						ComponentType xmlComponentType = (ComponentType) xmlObject;
 						ComponentHelper componentHelper = createComponent(xmlComponentType);
-						for (StringField stringField : componentHelper
-								.getFields())
+						for (StringField stringField : componentHelper.getFields())
 						{
 							message.setField(stringField);
 						}
@@ -448,21 +433,18 @@ public class QFixMessenger
 					TrailerType xmlTrailerType = xmlMessageType.getTrailer();
 					for (FieldType xmlFieldType : xmlTrailerType.getField())
 					{
-						message.getTrailer().setField(
-								createStringField(xmlFieldType));
+						message.getTrailer().setField(createStringField(xmlFieldType));
 					}
 				}
 
 				return sendQFixMessage(message, session);
 			} else
 			{
-				throw new QFixMessengerException("Session not logged on: "
-						+ xmlMessageType.getSession().getName());
+				throw new QFixMessengerException("Session not logged on: " + xmlMessageType.getSession().getName());
 			}
 		} else
 		{
-			throw new QFixMessengerException("Unrecognized session: "
-					+ xmlMessageType.getSession().getName());
+			throw new QFixMessengerException("Unrecognized session: " + xmlMessageType.getSession().getName());
 		}
 	}
 
@@ -495,21 +477,18 @@ public class QFixMessenger
 
 		for (GroupType xmlGroupType : xmlGroupsType.getGroup())
 		{
-			Object firstMember = xmlGroupType.getFieldOrGroupsOrComponent()
-					.get(0);
+			Object firstMember = xmlGroupType.getFieldOrGroupsOrComponent().get(0);
 			FieldType firstFieldType;
 			if (firstMember instanceof ComponentType)
 			{
-				firstFieldType = (FieldType) ((ComponentType) firstMember)
-						.getFieldOrGroupsOrComponent().get(0);
+				firstFieldType = (FieldType) ((ComponentType) firstMember).getFieldOrGroupsOrComponent().get(0);
 			} else
 			{
 				firstFieldType = (FieldType) firstMember;
 			}
 
 			int i = 0;
-			Group group = new Group(xmlGroupsType.getId(),
-					firstFieldType.getId());
+			Group group = new Group(xmlGroupsType.getId(), firstFieldType.getId());
 			for (Object xmlObject : xmlGroupType.getFieldOrGroupsOrComponent())
 			{
 				if (xmlObject instanceof FieldType)
@@ -551,6 +530,6 @@ public class QFixMessenger
 
 	private StringField createStringField(FieldType xmlFieldType)
 	{
-		return new StringField(xmlFieldType.getId(), xmlFieldType.getValue());
+		return new StringField(xmlFieldType.getId(), MessageFormatter.formatStringFromCheatCode(xmlFieldType.getValue()));
 	}
 }

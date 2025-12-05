@@ -51,6 +51,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 
+import com.jramoyo.fix.model.decode.MessageFormatter;
 import org.apache.log4j.Logger;
 
 /**
@@ -93,7 +94,7 @@ public class LogfileDialog extends JDialog
 			return;
 		}
 
-		String path = frame.getMessenger().getConfig().getLogFilePath();
+		String path = "log/acceptor/";// frame.getMessenger().getConfig().getLogFilePath();
 		String eventFileName = path + beginStr;
 		String messengeFileName = path + beginStr;
 
@@ -112,20 +113,18 @@ public class LogfileDialog extends JDialog
 
 		try
 		{
-			List<String> eventLines = Files.readAllLines(eventPath,
-					Charset.defaultCharset());
-			List<String> messageLines = Files.readAllLines(messagePath,
-					Charset.defaultCharset());
+			List<String> eventLines = Files.readAllLines(eventPath, Charset.defaultCharset());
+			List<String> messageLines = Files.readAllLines(messagePath, Charset.defaultCharset());
 
 			for (String l : eventLines)
 			{
-				eventTextArea.append(l);
+				eventTextArea.append(MessageFormatter.formatFixToString(l));
 				eventTextArea.append("\n");
 			}
 
 			for (String l : messageLines)
 			{
-				messageTextArea.append(l);
+				messageTextArea.append(MessageFormatter.formatFixToString(l));
 				messageTextArea.append("\n");
 			}
 		} catch (IOException e)

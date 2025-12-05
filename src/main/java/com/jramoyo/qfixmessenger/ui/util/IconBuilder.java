@@ -40,6 +40,8 @@ import javax.swing.ImageIcon;
 
 import com.jramoyo.qfixmessenger.config.QFixMessengerConfig;
 
+import java.net.URL;
+
 /**
  * @author jramoyo
  */
@@ -92,9 +94,13 @@ public final class IconBuilder
 	public static String CLEAR_ALL_ICON = "clear-all.png";
 	public static String INVALID_FIELD = "invalid-field.png";
 
-	public static ImageIcon build(QFixMessengerConfig config, String path)
-	{
-		String res = String.format("%s/%s", config.getIconsLocation(), path);
-		return new ImageIcon(IconBuilder.class.getResource(res));
-	}
+    public static ImageIcon build(QFixMessengerConfig config, String path) {
+        String res = String.format("/%s/%s", config.getIconsLocation(), path);
+        URL url = IconBuilder.class.getResource(res);
+        if (url == null) {
+            throw new RuntimeException("Icon not found: " + res);
+        }
+        return new ImageIcon(url);
+    }
+
 }

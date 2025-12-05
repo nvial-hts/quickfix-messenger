@@ -38,6 +38,7 @@ import java.util.List;
 
 import javax.swing.table.AbstractTableModel;
 
+import com.jramoyo.fix.model.decode.MessageFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -147,11 +148,10 @@ public class MessagesTableModel extends AbstractTableModel implements
 	{
 		try
 		{
-			MsgType msgType = (MsgType) message.getHeader().getField(
-					new MsgType());
+			MsgType msgType = (MsgType) message.getHeader().getField(new MsgType());
 			MessagesTableModelData data = new MessagesTableModelData(
 					new Date(), direction, QFixUtil.getSessionName(sessionId),
-					message.toString(), msgType.getValue());
+                    MessageFormatter.formatFixToString(message), msgType.getValue());
 			addRow(data);
 		} catch (FieldNotFound ex)
 		{

@@ -49,6 +49,7 @@ public class QFixMessengerConstants
 	public static final String UTC_DATE_FORMAT = "yyyyMMdd-HH:mm:ss.SSS";
 
 	public static final char SOH = '\001';
+    public static final char PIPE = '|';
 
 	public static final String BEGIN_STRING_FIX40 = "FIX.4.0";
 	public static final String BEGIN_STRING_FIX41 = "FIX.4.1";
